@@ -15,7 +15,7 @@ public class Book {
     private int year;
     private String status;
 
-    // Constructor
+    // Constructors
 
     public Book() {
 
@@ -119,9 +119,19 @@ public class Book {
         }
     }
 
+    public void deleteBook(Connection connection) {
+        String query = "DELETE"
+    }
     // Method to display books
-    public void displayBooks(Connection connection) {
-        String query = "SELECT * FROM books";
+    public void displayBooks(Connection connection, String stat) {
+        String query;
+        if ("available".equalsIgnoreCase(stat)) {
+            query = "SELECT * FROM books WHERE status = 'Available'";
+        } else if ("checked out".equalsIgnoreCase(status)) {
+            query = "SELECT * FROM books WHERE status = 'Checked Out'";
+        } else {
+            query = "SELECT * FROM books";
+        }
 
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
@@ -147,7 +157,6 @@ public class Book {
             System.out.println("----------------------------------------------------------------------------------------------------------------------------------------");
         } catch (SQLException e) {
             e.printStackTrace();
-            // Handle the SQL exception appropriately (e.g., log or throw)
         }
     }
 }

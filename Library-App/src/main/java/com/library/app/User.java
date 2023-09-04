@@ -11,7 +11,7 @@ public class User {
     private String telephone;
     private String address;
 
-    // Constructors (you can have multiple constructors based on your needs)
+    // Constructors
 
     public User() {
     }
@@ -24,7 +24,7 @@ public class User {
         this.address = address;
     }
 
-    // Getters and setters for each attribute
+    // Getters and setters
 
     public int getId() {
         return id;

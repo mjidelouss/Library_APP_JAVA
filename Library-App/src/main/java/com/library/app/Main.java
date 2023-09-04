@@ -7,7 +7,7 @@ public class Main {
 
         if (dbConnection != null) {
             Book bookManager = new Book();
-            bookManager.displayBooks(dbConnection);
+            bookManager.displayBooks(dbConnection, "");
 
             try {
                 dbConnection.close();
