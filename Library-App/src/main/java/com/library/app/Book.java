@@ -144,6 +144,55 @@ public class Book {
             e.printStackTrace();
         }
     }
+    public void updateBook(Connection connection, String newIsbn, String newTitle, String newAuthor, int newQuantity, String newCategory, int newYear, String newStatus) {
+        String selectSql = "SELECT * FROM books WHERE isbn = ?";
+
+        try (PreparedStatement selectStatement = connection.prepareStatement(selectSql)) {
+            selectStatement.setString(1, newIsbn);
+
+            ResultSet resultSet = selectStatement.executeQuery();
+
+            if (resultSet.next()) {
+                String existingTitle = resultSet.getString("title");
+                String existingAuthor = resultSet.getString("author");
+                int existingQuantity = resultSet.getInt("quantity");
+                String existingCategory = resultSet.getString("category");
+                int existingYear = resultSet.getInt("year");
+                String existingStatus = resultSet.getString("status");
+
+                if (newTitle.isEmpty()) newTitle = existingTitle;
+                if (newAuthor.isEmpty()) newAuthor = existingAuthor;
+                if (newQuantity <= 0) newQuantity = existingQuantity;
+                if (newCategory.isEmpty()) newCategory = existingCategory;
+                if (newYear <= 0) newYear = existingYear;
+                if (newStatus.isEmpty()) newStatus = existingStatus;
+
+                String updateSql = "UPDATE books SET title = ?, author = ?, isbn = ?, quantity = ?, category = ?, year = ?, status = ? WHERE isbn = ?";
+
+                try (PreparedStatement updateStatement = connection.prepareStatement(updateSql)) {
+                    updateStatement.setString(1, newTitle);
+                    updateStatement.setString(2, newAuthor);
+                    updateStatement.setString(3, newIsbn);
+                    updateStatement.setInt(4, newQuantity);
+                    updateStatement.setString(5, newCategory);
+                    updateStatement.setInt(6, newYear);
+                    updateStatement.setString(7, newStatus);
+                    updateStatement.setString(8, newIsbn);
+
+                    int rowsAffected = updateStatement.executeUpdate();
+                    if (rowsAffected > 0) {
+                        System.out.println("Book with ISBN " + newIsbn + " updated successfully.");
+                    } else {
+                        System.out.println("No book found with ISBN " + newIsbn + ". Update failed.");
+                    }
+                }
+            } else {
+                System.out.println("No book found with ISBN " + newIsbn + ". Update failed.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     public boolean deleteBook(Connection connection, String isbn) {
         String selectSql = "SELECT id, quantity FROM books WHERE isbn = ?";
         String deleteSql = "DELETE FROM books WHERE id = ?";
