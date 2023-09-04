@@ -123,7 +123,14 @@ public class Book {
     public void displayBooks(Connection connection) {
         String query = "SELECT * FROM books";
 
-        try (Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            System.out.println("List of Books:");
+            System.out.println("----------------------------------------------------------------------------------------------------------------------------------------");
+            System.out.printf("%-5s %-30s %-30s %-15s %-10s %-15s %-10s %-15s%n",
+                    "ID", "Title", "Author", "ISBN", "Quantity", "Category", "Year", "Status");
+            System.out.println("----------------------------------------------------------------------------------------------------------------------------------------");
+
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String title = resultSet.getString("title");
@@ -134,18 +141,13 @@ public class Book {
                 int year = resultSet.getInt("year");
                 String status = resultSet.getString("status");
 
-                System.out.println("ID: " + id);
-                System.out.println("Title: " + title);
-                System.out.println("Author: " + author);
-                System.out.println("ISBN: " + isbn);
-                System.out.println("Quantity: " + quantity);
-                System.out.println("Category: " + category);
-                System.out.println("Year: " + year);
-                System.out.println("Status: " + status);
-                System.out.println("-------------------------");
+                System.out.printf("%-5d %-30s %-30s %-15s %-10d %-15s %-10d %-15s%n",
+                        id, title, author, isbn, quantity, category, year, status);
             }
+            System.out.println("----------------------------------------------------------------------------------------------------------------------------------------");
         } catch (SQLException e) {
             e.printStackTrace();
+            // Handle the SQL exception appropriately (e.g., log or throw)
         }
     }
 }
