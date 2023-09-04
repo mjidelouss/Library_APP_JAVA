@@ -98,30 +98,95 @@ public class Book {
 
     // Method to add a book
     public void addBook(Connection connection) {
-        String sqlQuery = "INSERT INTO books (title, author, isbn, quantity, category, year, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
-            preparedStatement.setString(1, this.title);
-            preparedStatement.setString(2, this.author);
-            preparedStatement.setString(3, this.isbn);
-            preparedStatement.setInt(4, this.quantity);
-            preparedStatement.setString(5, this.category);
-            preparedStatement.setInt(6, this.year);
-            preparedStatement.setString(7, this.status);
+        String isbn = this.isbn;
 
-            int rowsAffected = preparedStatement.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Book added successfully.");
+        // Check if a book with the same ISBN already exists
+        String checkExistenceQuery = "SELECT id, quantity FROM books WHERE isbn = ?";
+
+        try (PreparedStatement checkExistenceStatement = connection.prepareStatement(checkExistenceQuery)) {
+            checkExistenceStatement.setString(1, isbn);
+            ResultSet resultSet = checkExistenceStatement.executeQuery();
+
+            if (resultSet.next()) {
+                // If a book with the same ISBN exists update its quantity
+                int existingBookId = resultSet.getInt("id");
+                int existingQuantity = resultSet.getInt("quantity");
+                int newQuantity = existingQuantity + this.quantity;
+
+                String updateQuantityQuery = "UPDATE books SET quantity = ? WHERE id = ?";
+                try (PreparedStatement updateQuantityStatement = connection.prepareStatement(updateQuantityQuery)) {
+                    updateQuantityStatement.setInt(1, newQuantity);
+                    updateQuantityStatement.setInt(2, existingBookId);
+                    updateQuantityStatement.executeUpdate();
+                    System.out.println("Book with ISBN " + isbn + " already exists. Quantity updated.");
+                }
             } else {
-                System.out.println("Failed to add the book.");
+                // Insert a new book if ISBN doesn't exist
+                String insertQuery = "INSERT INTO books (title, author, isbn, quantity, category, year, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+                    preparedStatement.setString(1, this.title);
+                    preparedStatement.setString(2, this.author);
+                    preparedStatement.setString(3, isbn);
+                    preparedStatement.setInt(4, this.quantity);
+                    preparedStatement.setString(5, this.category);
+                    preparedStatement.setInt(6, this.year);
+                    preparedStatement.setString(7, this.status);
+
+                    int rowsAffected = preparedStatement.executeUpdate();
+                    if (rowsAffected > 0) {
+                        System.out.println("New book added successfully.");
+                    } else {
+                        System.out.println("Failed to add the book.");
+                    }
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+    public boolean deleteBook(Connection connection, String isbn) {
+        String selectSql = "SELECT id, quantity FROM books WHERE isbn = ?";
+        String deleteSql = "DELETE FROM books WHERE id = ?";
 
-    public void deleteBook(Connection connection) {
-        String query = "DELETE"
+        try (PreparedStatement selectStatement = connection.prepareStatement(selectSql);
+             PreparedStatement deleteStatement = connection.prepareStatement(deleteSql)) {
+
+            // Retrieve book
+            selectStatement.setString(1, isbn);
+            ResultSet resultSet = selectStatement.executeQuery();
+
+            if (resultSet.next()) {
+                int bookId = resultSet.getInt("id");
+                int quantity = resultSet.getInt("quantity");
+
+                // Check if the book still has copies
+                if (quantity > 1) {
+                    quantity--;
+                    // Update the quantity in database
+                    String updateQuantitySql = "UPDATE books SET quantity = ? WHERE id = ?";
+                    try (PreparedStatement updateStatement = connection.prepareStatement(updateQuantitySql)) {
+                        updateStatement.setInt(1, quantity);
+                        updateStatement.setInt(2, bookId);
+                        updateStatement.executeUpdate();
+                    }
+                } else {
+                    // If there's only one copy delete the book from the database
+                    deleteStatement.setInt(1, bookId);
+                    deleteStatement.executeUpdate();
+                }
+
+                System.out.println("Book with ISBN " + isbn + " deleted successfully.");
+                return true;
+            } else {
+                System.out.println("No book found with ISBN " + isbn + ".");
+                return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
+
     // Method to display books
     public void displayBooks(Connection connection, String stat) {
         String query;
