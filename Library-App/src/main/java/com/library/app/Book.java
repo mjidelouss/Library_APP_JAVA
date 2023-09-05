@@ -4,6 +4,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.sql.Timestamp;
+import java.time.temporal.ChronoUnit;
 
 public class Book {
     private int id;
@@ -269,6 +272,52 @@ public class Book {
                         id, title, author, isbn, quantity, category, year, status);
             }
             System.out.println("----------------------------------------------------------------------------------------------------------------------------------------");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void borrowBook(Connection connection, int borrowerId, String isbn) {
+        String checkAvailabilityQuery = "SELECT id, title FROM books WHERE isbn = ? AND status = 'Available' AND quantity > 0";
+
+        try (PreparedStatement checkAvailabilityStatement = connection.prepareStatement(checkAvailabilityQuery)) {
+            checkAvailabilityStatement.setString(1, isbn);
+            ResultSet resultSet = checkAvailabilityStatement.executeQuery();
+
+            if (resultSet.next()) {
+                int bookId = resultSet.getInt("id");
+                String bookTitle = resultSet.getString("title");
+
+                // Calculate the due date
+                LocalDate currentDate = LocalDate.now();
+                LocalDate dueDate = currentDate.plus(1, ChronoUnit.WEEKS);
+
+                // Create a record of the borrowing with the due date
+                String insertRecordQuery = "INSERT INTO records (book_isbn, book_title, borrower_id, borrow_date, due_date) VALUES (?, ?, ?, ?, ?)";
+
+                try (PreparedStatement insertRecordStatement = connection.prepareStatement(insertRecordQuery)) {
+                    insertRecordStatement.setString(1, isbn);
+                    insertRecordStatement.setString(2, bookTitle);
+                    insertRecordStatement.setInt(3, borrowerId);
+
+                    // Get the current date and set it in the timestamp
+                    Timestamp borrowTimestamp = Timestamp.valueOf(currentDate.atStartOfDay());
+
+                    insertRecordStatement.setTimestamp(4, borrowTimestamp);
+
+                    // Get the due date and set it in the timestamp
+                    Timestamp dueTimestamp = Timestamp.valueOf(dueDate.atStartOfDay());
+
+                    insertRecordStatement.setTimestamp(5, dueTimestamp);
+
+                    insertRecordStatement.executeUpdate();
+
+                    System.out.println("Book with ISBN " + isbn + " has been borrowed by borrower ID " + borrowerId + ".");
+                    System.out.println("Due Date: " + dueDate);
+                }
+            } else {
+                System.out.println("Book with ISBN " + isbn + " is not available for borrowing.");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
