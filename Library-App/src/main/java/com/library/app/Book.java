@@ -302,14 +302,11 @@ public class Book {
 
                     // Get the current date and set it in the timestamp
                     Timestamp borrowTimestamp = Timestamp.valueOf(currentDate.atStartOfDay());
-
                     insertRecordStatement.setTimestamp(4, borrowTimestamp);
 
                     // Get the due date and set it in the timestamp
                     Timestamp dueTimestamp = Timestamp.valueOf(dueDate.atStartOfDay());
-
                     insertRecordStatement.setTimestamp(5, dueTimestamp);
-
                     insertRecordStatement.executeUpdate();
 
                     System.out.println("Book with ISBN " + isbn + " has been borrowed by borrower ID " + borrowerId + ".");
@@ -317,6 +314,25 @@ public class Book {
                 }
             } else {
                 System.out.println("Book with ISBN " + isbn + " is not available for borrowing.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public void returnBook(Connection connection, int borrowerId, String isbn) {
+        // Delete the record of the returned book
+        String deleteRecordQuery = "DELETE FROM records WHERE book_isbn = ? AND borrower_id = ?";
+
+        try (PreparedStatement deleteRecordStatement = connection.prepareStatement(deleteRecordQuery)) {
+            deleteRecordStatement.setString(1, isbn);
+            deleteRecordStatement.setInt(2, borrowerId);
+
+            int rowsAffected = deleteRecordStatement.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("Book with ISBN " + isbn + " has been returned by borrower ID " + borrowerId + ".");
+            } else {
+                System.out.println("No matching record found for the book with ISBN " + isbn + " and borrower ID " + borrowerId + ".");
             }
         } catch (SQLException e) {
             e.printStackTrace();
