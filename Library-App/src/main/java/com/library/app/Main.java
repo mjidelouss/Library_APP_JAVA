@@ -1,6 +1,8 @@
 package com.library.app;
 import java.sql.*;
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -8,7 +10,18 @@ public class Main {
 
         if (dbConnection != null) {
             Book bookManager = new Book();
-            bookManager.borrowBook(dbConnection, 2, "E141439518");
+            List<Book> books = bookManager.displayBooks(dbConnection, "Available");
+
+            for (Book book : books) {
+                System.out.println("Book ID: " + book.getId());
+                System.out.println("Title: " + book.getTitle());
+                System.out.println("Author: " + book.getAuthor());
+                System.out.println("ISBN: " + book.getIsbn());
+                System.out.println("Year: " + book.getYear());
+                System.out.println("Quantity: " + book.getQuantity());
+                System.out.println("Status: " + book.getStatus());
+                System.out.println();
+            }
             try {
                 dbConnection.close();
             } catch (SQLException e) {

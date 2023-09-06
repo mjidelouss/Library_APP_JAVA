@@ -1,4 +1,4 @@
 package com.library.app;
 
-public class Librarian {
+public class Librarian extends User{
 }

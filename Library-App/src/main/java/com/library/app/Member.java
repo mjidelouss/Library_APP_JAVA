@@ -1,4 +1,4 @@
 package com.library.app;
 
-public class Member {
+public class Member extends User{
 }
