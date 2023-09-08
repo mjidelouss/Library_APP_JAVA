@@ -25,8 +25,7 @@ public class Book {
     public Book() {
 
     }
-    public Book(int id, String title, String author, String isbn, int quantity, String category, int year, String status) {
-        this.id = id;
+    public Book(String title, String author, String isbn, int quantity, String category, int year, String status) {
         this.title = title;
         this.author = author;
         this.isbn = isbn;
@@ -139,12 +138,8 @@ public class Book {
 
                     int rowsAffected = preparedStatement.executeUpdate();
                     if (rowsAffected > 0) {
-                        ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-                        if (generatedKeys.next()) {
-                            int newBookId = generatedKeys.getInt(1);
-                            addedBook = new Book(newBookId, this.title, this.author, isbn, this.quantity, this.category, this.year, this.status);
+                            addedBook = new Book(this.title, this.author, isbn, this.quantity, this.category, this.year, this.status);
                             System.out.println("New book added successfully.");
-                        }
                     } else {
                         System.out.println("Failed to add the book.");
                     }
@@ -155,12 +150,12 @@ public class Book {
         }
         return addedBook;
     }
-    public Book updateBook(Connection connection, String newIsbn, String newTitle, String newAuthor, int newQuantity, String newCategory, int newYear, String newStatus) {
+    public Book updateBook(Connection connection, String newIsbn, String oldIsbn, String newTitle, String newAuthor, int newQuantity, String newCategory, int newYear, String newStatus) {
         String selectSql = "SELECT * FROM books WHERE isbn = ?";
-        Book updatedBook = null; // Initialize the updated book as null
+        Book updatedBook = null;
 
         try (PreparedStatement selectStatement = connection.prepareStatement(selectSql)) {
-            selectStatement.setString(1, newIsbn);
+            selectStatement.setString(1, oldIsbn);
 
             ResultSet resultSet = selectStatement.executeQuery();
 
@@ -193,8 +188,7 @@ public class Book {
 
                     int rowsAffected = updateStatement.executeUpdate();
                     if (rowsAffected > 0) {
-                        // Construct the updated book object
-                        updatedBook = new Book(resultSet.getInt("id"), newTitle, newAuthor, newIsbn, newQuantity, newCategory, newYear, newStatus);
+                        updatedBook = new Book(newTitle, newAuthor, newIsbn, newQuantity, newCategory, newYear, newStatus);
                         System.out.println("Book with ISBN " + newIsbn + " updated successfully.");
                     } else {
                         System.out.println("No book found with ISBN " + newIsbn + ". Update failed.");
@@ -277,7 +271,7 @@ public class Book {
                 int year = resultSet.getInt("year");
                 String status = resultSet.getString("status");
 
-                Book book = new Book(id, title, author, isbn, quantity, category, year, status);
+                Book book = new Book(title, author, isbn, quantity, category, year, status);
                 bookList.add(book);
             }
         } catch (SQLException e) {
@@ -379,4 +373,50 @@ public class Book {
         }
         return searchResults;
     }
+
+    public void bookStatistics(Connection connection) {
+        try {
+            // Query to get the count of available books
+            String availableBooksQuery = "SELECT COUNT(*) AS available_books FROM books WHERE status = 'Available'";
+            PreparedStatement availableBooksStatement = connection.prepareStatement(availableBooksQuery);
+            ResultSet availableBooksResult = availableBooksStatement.executeQuery();
+
+            int availableBooksCount = 0;
+            if (availableBooksResult.next()) {
+                availableBooksCount = availableBooksResult.getInt("available_books");
+            }
+
+            // Query to get the count of borrowed books
+            String borrowedBooksQuery = "SELECT COUNT(*) AS borrowed_books FROM books WHERE status = 'Checked Out'";
+            PreparedStatement borrowedBooksStatement = connection.prepareStatement(borrowedBooksQuery);
+            ResultSet borrowedBooksResult = borrowedBooksStatement.executeQuery();
+
+            int borrowedBooksCount = 0;
+            if (borrowedBooksResult.next()) {
+                borrowedBooksCount = borrowedBooksResult.getInt("borrowed_books");
+            }
+
+            // Query to get the count of lost books
+            String lostBooksQuery = "SELECT COUNT(*) AS lost_books FROM books WHERE status = 'Lost'";
+            PreparedStatement lostBooksStatement = connection.prepareStatement(lostBooksQuery);
+            ResultSet lostBooksResult = lostBooksStatement.executeQuery();
+
+            int lostBooksCount = 0;
+            if (lostBooksResult.next()) {
+                lostBooksCount = lostBooksResult.getInt("lost_books");
+            }
+
+            // Display the book statistics report
+            System.out.println("Book Statistics Report:");
+            System.out.println("------------------------------");
+            System.out.println("Available Books: " + availableBooksCount);
+            System.out.println("Borrowed Books: " + borrowedBooksCount);
+            System.out.println("Lost Books: " + lostBooksCount);
+            System.out.println("------------------------------");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

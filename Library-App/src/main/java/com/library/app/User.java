@@ -24,6 +24,12 @@ public class User {
         this.address = address;
     }
 
+    public User(int id, String name, String email) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+    }
+
     // Getters and setters
 
     public int getId() {
@@ -73,35 +79,38 @@ public class User {
     public void setAddress(String address) {
         this.address = address;
     }
-    public boolean register(Connection connection, String name, String email, String password, String telephone, String address) {
+    public User register(Connection connection, String name, String email, String password, String telephone, String adresse) {
+        String registerQuery = "INSERT INTO users (name, email, password, telephone, adresse) VALUES (?, ?, ?, ?, ?)";
 
-        String insertSql = "INSERT INTO users (name, email, password, telephone, address) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement registerStatement = connection.prepareStatement(registerQuery)) {
+            registerStatement.setString(1, name);
+            registerStatement.setString(2, email);
+            registerStatement.setString(3, password);
+            registerStatement.setString(4, telephone);
+            registerStatement.setString(5, adresse);
+            int rowsAffected = registerStatement.executeUpdate();
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(insertSql)) {
-            preparedStatement.setString(1, name);
-            preparedStatement.setString(2, email);
-            preparedStatement.setString(3, password);
-            preparedStatement.setString(4, telephone);
-            preparedStatement.setString(5, address);
-
-            int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("User registered successfully.");
-                return true;
-            } else {
-                System.out.println("Failed to register the user.");
-                return false;
+                ResultSet generatedKeys = registerStatement.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    int userId = generatedKeys.getInt(1);
+                    User user = new User(userId, name, email);
+                    return user;
+                }
             }
+
+            System.out.println("Registration failed.");
+            return null;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
-    public boolean login(Connection connection, String email, String password) {
-        String userLoginQuery = "SELECT id FROM users WHERE email = ? AND password = ?";
+    public User login(Connection connection, String email, String password) {
+        String userLoginQuery = "SELECT user_id, name, email FROM users WHERE email = ? AND password = ?";
         // Check if the user is in the 'librarian' or 'members' table
-        String librarianCheckQuery = "SELECT user_id FROM librarian WHERE user_id = ?";
-        String membersCheckQuery = "SELECT user_id FROM members WHERE user_id = ?";
+        String librarianCheckQuery = "SELECT librarian_id FROM librarian WHERE librarian_id = ?";
+        String membersCheckQuery = "SELECT member_id FROM members WHERE member_id = ?";
 
         try (PreparedStatement userLoginStatement = connection.prepareStatement(userLoginQuery);
              PreparedStatement librarianCheckStatement = connection.prepareStatement(librarianCheckQuery);
@@ -113,33 +122,18 @@ public class User {
             ResultSet resultSet = userLoginStatement.executeQuery();
 
             if (resultSet.next()) {
-                int userId = resultSet.getInt("id");
-
-                // Check if the user is in the 'librarian' table
-                librarianCheckStatement.setInt(1, userId);
-                ResultSet librarianResult = librarianCheckStatement.executeQuery();
-
-                // Check if the user is in the 'members' table
-                membersCheckStatement.setInt(1, userId);
-                ResultSet membersResult = membersCheckStatement.executeQuery();
-
-                if (librarianResult.next()) {
-                    System.out.println("Librarian logged in successfully.");
-                    return true;
-                } else if (membersResult.next()) {
-                    System.out.println("Member logged in successfully.");
-                    return true;
-                } else {
-                    System.out.println("User is not a librarian or member.");
-                    return false;
-                }
+                int userId = resultSet.getInt("user_id");
+                String userName = resultSet.getString("name");
+                String userEmail = resultSet.getString("email");
+                User user = new User(userId, userName, userEmail);
+                return user;
             } else {
                 System.out.println("Invalid email or password.");
-                return false;
+                return null;
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 }
