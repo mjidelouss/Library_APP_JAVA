@@ -281,74 +281,13 @@ public class Book {
         return bookList;
     }
 
-    public void borrowBook(Connection connection, int borrowerId, String isbn) {
-        String checkAvailabilityQuery = "SELECT id, title FROM books WHERE isbn = ? AND status = 'Available' AND quantity > 0";
-
-        try (PreparedStatement checkAvailabilityStatement = connection.prepareStatement(checkAvailabilityQuery)) {
-            checkAvailabilityStatement.setString(1, isbn);
-            ResultSet resultSet = checkAvailabilityStatement.executeQuery();
-
-            if (resultSet.next()) {
-                int bookId = resultSet.getInt("id");
-                String bookTitle = resultSet.getString("title");
-
-                // Calculate the due date
-                LocalDate currentDate = LocalDate.now();
-                LocalDate dueDate = currentDate.plus(1, ChronoUnit.WEEKS);
-
-                // Create a record of the borrowing with the due date
-                String insertRecordQuery = "INSERT INTO records (book_isbn, book_title, borrower_id, borrow_date, due_date) VALUES (?, ?, ?, ?, ?)";
-
-                try (PreparedStatement insertRecordStatement = connection.prepareStatement(insertRecordQuery)) {
-                    insertRecordStatement.setString(1, isbn);
-                    insertRecordStatement.setString(2, bookTitle);
-                    insertRecordStatement.setInt(3, borrowerId);
-
-                    // Get the current date and set it in the timestamp
-                    Timestamp borrowTimestamp = Timestamp.valueOf(currentDate.atStartOfDay());
-                    insertRecordStatement.setTimestamp(4, borrowTimestamp);
-
-                    // Get the due date and set it in the timestamp
-                    Timestamp dueTimestamp = Timestamp.valueOf(dueDate.atStartOfDay());
-                    insertRecordStatement.setTimestamp(5, dueTimestamp);
-                    insertRecordStatement.executeUpdate();
-
-                    System.out.println("Book with ISBN " + isbn + " has been borrowed by borrower ID " + borrowerId + ".");
-                    System.out.println("Due Date: " + dueDate);
-                }
-            } else {
-                System.out.println("Book with ISBN " + isbn + " is not available for borrowing.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    public void returnBook(Connection connection, int borrowerId, String isbn) {
-        // Delete the record of the returned book
-        String deleteRecordQuery = "DELETE FROM records WHERE book_isbn = ? AND borrower_id = ?";
-
-        try (PreparedStatement deleteRecordStatement = connection.prepareStatement(deleteRecordQuery)) {
-            deleteRecordStatement.setString(1, isbn);
-            deleteRecordStatement.setInt(2, borrowerId);
-
-            int rowsAffected = deleteRecordStatement.executeUpdate();
-
-            if (rowsAffected > 0) {
-                System.out.println("Book with ISBN " + isbn + " has been returned by borrower ID " + borrowerId + ".");
-            } else {
-                System.out.println("No matching record found for the book with ISBN " + isbn + " and borrower ID " + borrowerId + ".");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
     public List<Book> searchBook(Connection connection, String searchTerm) {
         String query = "SELECT DISTINCT * FROM books WHERE title LIKE ? OR author LIKE ?";
         List<Book> searchResults = new ArrayList<>();
 
         try {
             PreparedStatement statement = connection.prepareStatement(query);
-            String searchPattern = "%" + searchTerm + "%"; // Use '%' for partial matching
+            String searchPattern = "%" + searchTerm + "%";
             statement.setString(1, searchPattern);
             statement.setString(2, searchPattern);
             ResultSet resultSet = statement.executeQuery();

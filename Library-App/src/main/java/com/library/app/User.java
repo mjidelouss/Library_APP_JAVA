@@ -3,6 +3,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 public class User {
     private int id;
     private String name;
@@ -80,9 +81,11 @@ public class User {
         this.address = address;
     }
     public User register(Connection connection, String name, String email, String password, String telephone, String adresse) {
-        String registerQuery = "INSERT INTO users (name, email, password, telephone, adresse) VALUES (?, ?, ?, ?, ?)";
+        String registerQuery = "INSERT INTO users (name, email, password, telephone, address) VALUES (?, ?, ?, ?, ?)";
+        String selectQuery = "SELECT LAST_INSERT_ID() AS user_id";
 
-        try (PreparedStatement registerStatement = connection.prepareStatement(registerQuery)) {
+        try (PreparedStatement registerStatement = connection.prepareStatement(registerQuery);
+             Statement selectStatement = connection.createStatement()) {
             registerStatement.setString(1, name);
             registerStatement.setString(2, email);
             registerStatement.setString(3, password);
@@ -91,14 +94,13 @@ public class User {
             int rowsAffected = registerStatement.executeUpdate();
 
             if (rowsAffected > 0) {
-                ResultSet generatedKeys = registerStatement.getGeneratedKeys();
-                if (generatedKeys.next()) {
-                    int userId = generatedKeys.getInt(1);
+                ResultSet resultSet = selectStatement.executeQuery(selectQuery);
+                if (resultSet.next()) {
+                    int userId = resultSet.getInt("user_id");
                     User user = new User(userId, name, email);
                     return user;
                 }
             }
-
             System.out.println("Registration failed.");
             return null;
         } catch (SQLException e) {
