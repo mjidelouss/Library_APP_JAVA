@@ -119,7 +119,14 @@ public class Main {
             scanner.nextLine();
             switch (choice) {
                 case 1:
-                    bookManager.displayBooks(dbConnection, "Available");
+                    List<Book> books = bookManager.displayBooks(dbConnection, "Available");
+                    System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════════════════════════════════════════════════════════════════════════════════╗");
+                    System.out.println("\t        ║            Title               ║            Author            ║            ISBN             ║            Year             ║            Quantity                 ║            Status                   ║");
+                    System.out.println("\t        ╠══════════════╬════════════════════════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════════════════════════════╬═════════════════════════════════════╣");
+                    for (Book book : books) {
+                        System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %35s ║ %34s  ║%n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getYear(), book.getQuantity(), book.getStatus());
+                    }
+                    System.out.println("\t        ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
                     break;
                 case 2:
                     System.out.print("Search Term : ");
@@ -167,7 +174,7 @@ public class Main {
             System.out.println('\t'+"                         ██╗                                                               ██");
             System.out.println('\t'+"                         ██╗ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ █ ██ ██ ██ ██");
             System.out.println('\t'+"                         ██╗                                                              ═██");
-            System.out.println('\t'+"                         ██╗ 1- Add a new Book or a Copy.                                 ═██");
+            System.out.println('\t'+"                         ██╗ 1- Add a new Book          .                                 ═██");
             System.out.println('\t'+"                         ██╗ 2- Modify an existing Book.                                  ═██");
             System.out.println('\t'+"                         ██╗ 3- Delete a Book.                                            ═██");
             System.out.println('\t'+"                         ██╗ 4- Display List of borrowed Books.                           ═██");
@@ -231,8 +238,7 @@ public class Main {
                     bookMaster.displayBooks(dbConnection, "Checked Out");
                     break;
                 case 5:
-                    // Generate Books Statistics report
-
+                    bookMaster.bookStatistics(dbConnection);
                     break;
                 case 6:
                     user_id = 0;
@@ -297,8 +303,7 @@ public class Main {
         }
     }
     public static void clearTerminal() {
-        for(int clear = 0; clear < 20; clear++) {
-            System.out.println("\b") ;
-        }
+        System. out.print("\033[H\033[2J");
+        System. out.flush();
     }
 }

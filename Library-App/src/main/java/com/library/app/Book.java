@@ -407,12 +407,11 @@ public class Book {
             }
 
             // Display the book statistics report
-            System.out.println("Book Statistics Report:");
-            System.out.println("------------------------------");
-            System.out.println("Available Books: " + availableBooksCount);
-            System.out.println("Borrowed Books: " + borrowedBooksCount);
-            System.out.println("Lost Books: " + lostBooksCount);
-            System.out.println("------------------------------");
+            System.out.println("\t        ╔══════════════════════╦══════════════════╦══════════════════════╦══════════════════╦═════════════════════╦═══════════════╗");
+            System.out.println("\t        ║            Total Available Books        ║            Total Borrowed Books         ║             Total Lost Books        ║");
+            System.out.println("\t        ╠══════════════════════╬══════════════════╬══════════════════════╬══════════════════╬═════════════════════╬═══════════════╣");
+            System.out.printf("\t        ║ %39s ║ %39s ║ %35s ║%n", availableBooksCount, borrowedBooksCount, lostBooksCount);
+            System.out.println("\t        ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
 
         } catch (SQLException e) {
             e.printStackTrace();
