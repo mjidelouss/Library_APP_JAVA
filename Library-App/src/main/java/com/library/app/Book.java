@@ -202,7 +202,7 @@ public class Book {
         }
         return updatedBook;
     }
-    public boolean deleteBook(Connection connection, String isbn) {
+    public boolean deleteBook(Connection connection, String isbn, int quantity) {
         String selectSql = "SELECT id, quantity FROM books WHERE isbn = ?";
         String deleteSql = "DELETE FROM books WHERE id = ?";
 
@@ -215,26 +215,32 @@ public class Book {
 
             if (resultSet.next()) {
                 int bookId = resultSet.getInt("id");
-                int quantity = resultSet.getInt("quantity");
+                int currentQuantity = resultSet.getInt("quantity");
 
-                // Check if the book still has copies
-                if (quantity > 1) {
-                    quantity--;
-                    // Update the quantity in database
-                    String updateQuantitySql = "UPDATE books SET quantity = ? WHERE id = ?";
-                    try (PreparedStatement updateStatement = connection.prepareStatement(updateQuantitySql)) {
-                        updateStatement.setInt(1, quantity);
-                        updateStatement.setInt(2, bookId);
-                        updateStatement.executeUpdate();
+                // Check if the book has enough copies to delete
+                if (currentQuantity >= quantity) {
+                    int newQuantity = currentQuantity - quantity;
+
+                    if (newQuantity > 0) {
+                        // Update the quantity in database
+                        String updateQuantitySql = "UPDATE books SET quantity = ? WHERE id = ?";
+                        try (PreparedStatement updateStatement = connection.prepareStatement(updateQuantitySql)) {
+                            updateStatement.setInt(1, newQuantity);
+                            updateStatement.setInt(2, bookId);
+                            updateStatement.executeUpdate();
+                        }
+                    } else {
+                        // If the quantity becomes zero, delete the book from the database
+                        deleteStatement.setInt(1, bookId);
+                        deleteStatement.executeUpdate();
                     }
-                } else {
-                    // If there's only one copy delete the book from the database
-                    deleteStatement.setInt(1, bookId);
-                    deleteStatement.executeUpdate();
-                }
 
-                System.out.println("Book with ISBN " + isbn + " deleted successfully.");
-                return true;
+                    System.out.println("Successfully deleted " + quantity + " copies of the book with ISBN " + isbn + ".");
+                    return true;
+                } else {
+                    System.out.println("Insufficient quantity. Unable to delete " + quantity + " copies of the book with ISBN " + isbn + ".");
+                    return false;
+                }
             } else {
                 System.out.println("No book found with ISBN " + isbn + ".");
                 return false;
@@ -356,5 +362,23 @@ public class Book {
             e.printStackTrace();
         }
     }
+
+    public int getBookQuantity(Connection connection, String isbn) {
+        String sqlQuery = "SELECT quantity FROM books WHERE isbn = ?";
+        int bookQuantity = 0;
+
+        try (PreparedStatement selectStatement = connection.prepareStatement(sqlQuery)) {
+            selectStatement.setString(1, isbn);
+            ResultSet resultSet = selectStatement.executeQuery();
+
+            if (resultSet.next()) {
+                bookQuantity = resultSet.getInt("quantity");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception appropriately in your application
+        }
+        return bookQuantity;
+    }
+
 
 }

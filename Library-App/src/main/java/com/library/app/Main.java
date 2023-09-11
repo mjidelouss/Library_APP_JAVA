@@ -75,8 +75,6 @@ public class Main {
                     System.out.print("Email : ");
                     String newEmail = scan1.nextLine();
                     System.out.print("Password : ");
-                    String oldPassword = scan1.nextLine();
-                    System.out.print("Confirm Password : ");
                     String newPassword = scan1.nextLine();
                     User loggedUser = user.register(dbConnection, name, newEmail, newPassword, telephone, adresse);
                     if (loggedUser != null) {
@@ -133,11 +131,11 @@ public class Main {
                 case 2:
                     System.out.print("Search Term : ");
                     String searchTerm = scanner.nextLine();
-                    List<Book> seqrchedBooks = bookManager.searchBook(dbConnection, searchTerm);
+                    List<Book> searchedBooks = bookManager.searchBook(dbConnection, searchTerm);
                     System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════════════════════════════════════════════════════════════════════════════════╗");
                     System.out.println("\t        ║            Title               ║            Author            ║            ISBN             ║            Year             ║            Quantity                 ║            Status                   ║");
-                    System.out.println("\t        ╠══════════════╬════════════════════════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════════════════════════════╬═════════════════════════════════════╣");
-                    for (Book book : seqrchedBooks) {
+                    System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════════════════════════════╬═════════════════════════════════════╣");
+                    for (Book book : searchedBooks) {
                         System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %35s ║ %34s  ║%n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getYear(), book.getQuantity(), book.getStatus());
                     }
                     System.out.println("\t        ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
@@ -147,9 +145,9 @@ public class Main {
                     String borrowIsbn = scanner.nextLine();
                     BorrowedBook borrowedBook = borrowedBookManager.borrowBook(dbConnection, user_id, borrowIsbn);
                     System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦════════════════════════════════════════════════════════╗");
-                    System.out.println("\t        ║            ID               ║            Title            ║            ISBN             ║            Borrow_Date             ║            Due_Date                 ║");
-                    System.out.println("\t        ╠══════════════╬════════════════════════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬════════════════════════════════════════╣");
-                        System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %35s ║%n", borrowedBook.getId(), borrowedBook.getBookTitle(), borrowedBook.getBookIsbn(), borrowedBook.getBorrowDate(), borrowedBook.getDueDate());
+                    System.out.println("\t        ║           Book ID              ║            Title             ║            ISBN             ║            Borrow_Date      ║            Due_Date                    ║");
+                    System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬════════════════════════════════════════╣");
+                        System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %38s ║%n", borrowedBook.getId(), borrowedBook.getBookTitle(), borrowedBook.getBookIsbn(), borrowedBook.getBorrowDate(), borrowedBook.getDueDate());
                     System.out.println("\t        ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
                     break;
                 case 4:
@@ -159,8 +157,8 @@ public class Main {
                     LocalDate todayDate = LocalDate.now();
                     Date returnedDate = Date.valueOf(todayDate);
                     System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╗");
-                    System.out.println("\t        ║            ID               ║            Title            ║            ISBN             ║            Returned_Date        ║");
-                    System.out.println("\t        ╠══════════════╬════════════════════════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╣");
+                    System.out.println("\t        ║            Book ID             ║            Title             ║            ISBN             ║        Returned_Date        ║");
+                    System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╣");
                     System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║%n", returnedBook.getId(), returnedBook.getBookTitle(), returnedBook.getBookIsbn(), returnedDate);
                     System.out.println("\t        ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
                     break;
@@ -239,6 +237,7 @@ public class Main {
                     scan1.nextLine();
                     System.out.print("New Category : ");
                     String newCategory = scan1.nextLine();
+                    scan1.nextLine();
                     System.out.print("New Year : ");
                     int newYear = scan1.nextInt();
                     scan1.nextLine();
@@ -252,7 +251,10 @@ public class Main {
                     bookMaster.displayBooks(dbConnection, "");
                     System.out.print("Enter Book ISBN : ");
                     String delIsbn = scan2.nextLine();
-                    bookMaster.deleteBook(dbConnection, delIsbn);
+                    System.out.printf("%d Copies exist of this Book, How many do you wanna delete : ", bookMaster.getBookQuantity(dbConnection, delIsbn));
+                    int number = scan2.nextInt();
+                    scan2.nextLine();
+                    bookMaster.deleteBook(dbConnection, delIsbn, number);
                     break;
                 case 4:
 

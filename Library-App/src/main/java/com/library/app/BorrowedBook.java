@@ -163,7 +163,7 @@ public class BorrowedBook {
         return null;
     }
 
-    public List<BorrowedBook> displayBorrowedBooks(Connection connection) {
-        String query = "SELECT * FROM books WHERE status = 'Available'";
-    }
+   // public List<BorrowedBook> displayBorrowedBooks(Connection connection) {
+        // String query = "SELECT * FROM books WHERE status = 'Available'";
+        // }
 }
