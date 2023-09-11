@@ -1,9 +1,18 @@
 package com.library.app;
-import java.io.IOException;
+import com.library.app.domain.*;
+import com.library.app.infrastructure.DbConnection;
+import com.library.app.repository.BookRepository;
+import com.library.app.repository.BorrowedBooksRepository;
+import com.library.app.repository.LostBooksRepository;
+import com.library.app.repository.MemberRepository;
+import com.library.app.services.BookService;
+import com.library.app.services.BorrowedBooksService;
+import com.library.app.services.LostBooksService;
+import com.library.app.services.MemberService;
+
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.Scanner;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -44,6 +53,8 @@ public class Main {
             User user = new User();
             Member member = new Member();
             Librarian librarian = new Librarian();
+            MemberRepository memberRepository = new MemberRepository(dbConnection);
+            MemberService memberService = new MemberService(memberRepository);
             switch (choice) {
                 case 1:
                     Scanner scan = new Scanner(System.in);
@@ -54,7 +65,7 @@ public class Main {
                     User loggedInUser = user.login(dbConnection, email, password);
                     if (loggedInUser != null) {
                         int user_id = loggedInUser.getId();
-                        if (member.checkMember(dbConnection, user_id)) {
+                        if (memberService.checkMember(user_id)) {
                             memberMenu(user_id);
                         } else {
                             librarianMenu(user_id);
@@ -95,6 +106,10 @@ public class Main {
         clearTerminal();
         Connection dbConnection = DbConnection.connect();
         Book bookManager = new Book();
+        BookRepository bookRepository = new BookRepository(dbConnection);
+        BookService bookService = new BookService(bookRepository);
+        BorrowedBooksRepository borrowedBooksRepository = new BorrowedBooksRepository(dbConnection);
+        BorrowedBooksService borrowedBooksService = new BorrowedBooksService(borrowedBooksRepository);
         BorrowedBook borrowedBookManager = new BorrowedBook();
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -119,7 +134,7 @@ public class Main {
             scanner.nextLine();
             switch (choice) {
                 case 1:
-                    List<Book> books = bookManager.displayBooks(dbConnection);
+                    List<Book> books = bookService.displayBooks();
                     System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═════════════════════════════════════════════════════╗");
                     System.out.println("\t        ║            Title               ║            Author            ║            ISBN             ║            Year             ║            Quantity                 ║");
                     System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════════════════════════════╣");
@@ -131,7 +146,7 @@ public class Main {
                 case 2:
                     System.out.print("Search Term : ");
                     String searchTerm = scanner.nextLine();
-                    List<Book> searchedBooks = bookManager.searchBook(dbConnection, searchTerm);
+                    List<Book> searchedBooks = bookService.searchBook(searchTerm);
                     System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╦═════════════════════════════════════╗");
                     System.out.println("\t        ║            Title               ║            Author            ║            ISBN             ║            Year             ║            Quantity                 ║");
                     System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════════════════════════════╣");
@@ -143,7 +158,7 @@ public class Main {
                 case 3:
                     System.out.print("Enter ISBN : ");
                     String borrowIsbn = scanner.nextLine();
-                    BorrowedBook borrowedBook = borrowedBookManager.borrowBook(dbConnection, user_id, borrowIsbn);
+                    BorrowedBook borrowedBook = borrowedBooksService.borrowBook(user_id, borrowIsbn);
                     System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦════════════════════════════════════════════════════════╗");
                     System.out.println("\t        ║           Book ID              ║            Title             ║            ISBN             ║         Borrow_Date         ║            Due_Date                    ║");
                     System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬════════════════════════════════════════╣");
@@ -153,7 +168,7 @@ public class Main {
                 case 4:
                     System.out.print("Enter ISBN : ");
                     String returnIsbn = scanner.nextLine();
-                    BorrowedBook returnedBook = borrowedBookManager.returnBook(dbConnection, user_id, returnIsbn);
+                    BorrowedBook returnedBook = borrowedBooksService.returnBook(user_id, returnIsbn);
                     LocalDate todayDate = LocalDate.now();
                     Date returnedDate = Date.valueOf(todayDate);
                     System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╗");
@@ -180,8 +195,14 @@ public class Main {
         clearTerminal();
         Connection dbConnection = DbConnection.connect();
         Book bookMaster = new Book();
+        BookRepository bookRepository = new BookRepository(dbConnection);
+        BookService bookService = new BookService(bookRepository);
+        BorrowedBooksRepository borrowedBooksRepository = new BorrowedBooksRepository(dbConnection);
+        BorrowedBooksService borrowedBooksService = new BorrowedBooksService(borrowedBooksRepository);
         BorrowedBook borrowedBookManager = new BorrowedBook();
         LostBook lostBookManager = new LostBook();
+        LostBooksRepository lostBooksRepository = new LostBooksRepository(dbConnection);
+        LostBooksService lostBooksService = new LostBooksService(lostBooksRepository);
         Scanner scanner = new Scanner(System.in);
         while (true) {
             art();
@@ -222,11 +243,11 @@ public class Main {
                     int year = scan.nextInt();
                     scan.nextLine();
                     Book bookManager = new Book(title, author, isbn, quantity, category, year);
-                    bookManager.addBook(dbConnection);
+                    bookService.addBook(bookManager);
                     break;
                 case 2:
                     Scanner scan1 = new Scanner(System.in);
-                    bookMaster.displayBooks(dbConnection);
+                    bookService.displayBooks();
                     System.out.print("Enter Book ISBN : ");
                     String oldIsbn = scan1.nextLine();
                     System.out.print("New Title : ");
@@ -247,20 +268,20 @@ public class Main {
                     if (bookMaster.getIsbn().isEmpty()) {
                         bookMaster.setIsbn(oldIsbn);
                     }
-                    bookMaster.updateBook(dbConnection, oldIsbn, bookMaster);
+                    bookService.updateBook(oldIsbn, bookMaster);
                     break;
                 case 3:
                     Scanner scan2 = new Scanner(System.in);
-                    bookMaster.displayBooks(dbConnection);
+                    bookService.displayBooks();
                     System.out.print("Enter Book ISBN : ");
                     String delIsbn = scan2.nextLine();
-                    System.out.printf("%d Copies exist of this Book, How many do you wanna delete : ", bookMaster.getBookQuantity(dbConnection, delIsbn));
+                    System.out.printf("%d Copies exist of this Book, How many do you wanna delete : ", bookService.getBookQuantity(delIsbn));
                     int number = scan2.nextInt();
                     scan2.nextLine();
-                    bookMaster.deleteBook(dbConnection, delIsbn, number);
+                    bookService.deleteBook(delIsbn, number);
                     break;
                 case 4:
-                    List<BorrowedBook> borrowedBooks = borrowedBookManager.displayBorrowedBooks(dbConnection);
+                    List<BorrowedBook> borrowedBooks = borrowedBooksService.displayBorrowedBooks();
                     System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╦═════════════╦════════════════════════════════════════════════════════╗");
                     System.out.println("\t        ║            Title               ║            Author            ║            ISBN             ║            Year             ║         Borrow_Date         ║               Due_Date                 ║");
                     System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬══════════════════╬═════════════════════╣");
@@ -270,7 +291,7 @@ public class Main {
                     System.out.println("\t        ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
                     break;
                 case 5:
-                    List<LostBook> lostBooks = lostBookManager.displayLostBooks(dbConnection);
+                    List<LostBook> lostBooks = lostBooksService.displayLostBooks();
                     System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╗");
                     System.out.println("\t        ║            Title               ║            Author            ║            ISBN             ║            Year             ║");
                     System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╣");
@@ -280,7 +301,7 @@ public class Main {
                     System.out.println("\t        ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
                     break;
                 case 6:
-                    int[] counts = bookMaster.bookStatistics(dbConnection);
+                    int[] counts = bookService.bookStatistics();
                     int availableBooksCount = counts[0];
                     int borrowedBooksCount = counts[1];
                     int lostBooksCount = counts[2];
