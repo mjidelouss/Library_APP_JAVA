@@ -119,33 +119,33 @@ public class Main {
             scanner.nextLine();
             switch (choice) {
                 case 1:
-                    List<Book> books = bookManager.displayBooks(dbConnection, "Available");
-                    System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════════════════════════════════════════════════════════════════════════════════╗");
-                    System.out.println("\t        ║            Title               ║            Author            ║            ISBN             ║            Year             ║            Quantity                 ║            Status                   ║");
-                    System.out.println("\t        ╠══════════════╬════════════════════════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════════════════════════════╬═════════════════════════════════════╣");
+                    List<Book> books = bookManager.displayBooks(dbConnection);
+                    System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═════════════════════════════════════════════════════╗");
+                    System.out.println("\t        ║            Title               ║            Author            ║            ISBN             ║            Year             ║            Quantity                 ║");
+                    System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════════════════════════════╣");
                     for (Book book : books) {
-                        System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %35s ║ %34s  ║%n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getYear(), book.getQuantity(), book.getStatus());
+                        System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %35s ║%n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getYear(), book.getQuantity());
                     }
-                    System.out.println("\t        ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
+                    System.out.println("\t        ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
                     break;
                 case 2:
                     System.out.print("Search Term : ");
                     String searchTerm = scanner.nextLine();
                     List<Book> searchedBooks = bookManager.searchBook(dbConnection, searchTerm);
-                    System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════════════════════════════════════════════════════════════════════════════════╗");
-                    System.out.println("\t        ║            Title               ║            Author            ║            ISBN             ║            Year             ║            Quantity                 ║            Status                   ║");
-                    System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════════════════════════════╬═════════════════════════════════════╣");
+                    System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╦═════════════════════════════════════╗");
+                    System.out.println("\t        ║            Title               ║            Author            ║            ISBN             ║            Year             ║            Quantity                 ║");
+                    System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════════════════════════════╣");
                     for (Book book : searchedBooks) {
-                        System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %35s ║ %34s  ║%n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getYear(), book.getQuantity(), book.getStatus());
+                        System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %35s ║%n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getYear(), book.getQuantity());
                     }
-                    System.out.println("\t        ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
+                    System.out.println("\t        ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
                     break;
                 case 3:
                     System.out.print("Enter ISBN : ");
                     String borrowIsbn = scanner.nextLine();
                     BorrowedBook borrowedBook = borrowedBookManager.borrowBook(dbConnection, user_id, borrowIsbn);
                     System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦════════════════════════════════════════════════════════╗");
-                    System.out.println("\t        ║           Book ID              ║            Title             ║            ISBN             ║            Borrow_Date      ║            Due_Date                    ║");
+                    System.out.println("\t        ║           Book ID              ║            Title             ║            ISBN             ║         Borrow_Date         ║            Due_Date                    ║");
                     System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬════════════════════════════════════════╣");
                         System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %38s ║%n", borrowedBook.getId(), borrowedBook.getBookTitle(), borrowedBook.getBookIsbn(), borrowedBook.getBorrowDate(), borrowedBook.getDueDate());
                     System.out.println("\t        ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
@@ -180,6 +180,8 @@ public class Main {
         clearTerminal();
         Connection dbConnection = DbConnection.connect();
         Book bookMaster = new Book();
+        BorrowedBook borrowedBookManager = new BorrowedBook();
+        LostBook lostBookManager = new LostBook();
         Scanner scanner = new Scanner(System.in);
         while (true) {
             art();
@@ -194,9 +196,10 @@ public class Main {
             System.out.println('\t'+"                         ██╗ 2- Modify an existing Book.                                  ═██");
             System.out.println('\t'+"                         ██╗ 3- Delete a Book.                                            ═██");
             System.out.println('\t'+"                         ██╗ 4- Display List of borrowed Books.                           ═██");
-            System.out.println('\t'+"                         ██╗ 5- Generate Books Statistics report.                         ═██");
-            System.out.println('\t'+"                         ██╗ 6- Disconnect.                                               ═██");
-            System.out.println('\t'+"                         ██╗ 7- Quit.                                                     ═██");
+            System.out.println('\t'+"                         ██╗ 5- Display List of Lost Books.                               ═██");
+            System.out.println('\t'+"                         ██╗ 6- Generate Books Statistics report.                         ═██");
+            System.out.println('\t'+"                         ██╗ 7- Disconnect.                                               ═██");
+            System.out.println('\t'+"                         ██╗ 8- Quit.                                                     ═██");
             System.out.println('\t'+"                         ██╗                                                              ═██");
             System.out.println('\t'+"                         ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██");
             int choice = scanner.nextInt();
@@ -218,37 +221,37 @@ public class Main {
                     System.out.print("Year : ");
                     int year = scan.nextInt();
                     scan.nextLine();
-                    Book bookManager = new Book(title, author, isbn, quantity, category, year, "Available");
+                    Book bookManager = new Book(title, author, isbn, quantity, category, year);
                     bookManager.addBook(dbConnection);
                     break;
                 case 2:
                     Scanner scan1 = new Scanner(System.in);
-                    bookMaster.displayBooks(dbConnection, "");
+                    bookMaster.displayBooks(dbConnection);
                     System.out.print("Enter Book ISBN : ");
                     String oldIsbn = scan1.nextLine();
                     System.out.print("New Title : ");
-                    String newTitle = scan1.nextLine();
+                    bookMaster.setTitle(scan1.nextLine());
                     System.out.print("New Author : ");
-                    String newAuthor = scan1.nextLine();
+                    bookMaster.setAuthor(scan1.nextLine());
                     System.out.print("New ISBN : ");
-                    String newIsbn = scan1.nextLine();
+                    bookMaster.setIsbn(scan1.nextLine());
                     System.out.print("New Quantity : ");
-                    int newQuantity = scan1.nextInt();
+                    bookMaster.setQuantity(scan1.nextInt());
                     scan1.nextLine();
                     System.out.print("New Category : ");
-                    String newCategory = scan1.nextLine();
+                    bookMaster.setCategory(scan1.nextLine());
                     scan1.nextLine();
                     System.out.print("New Year : ");
-                    int newYear = scan1.nextInt();
+                    bookMaster.setYear(scan1.nextInt());
                     scan1.nextLine();
-                    if (newIsbn.isEmpty()) {
-                        newIsbn = oldIsbn;
+                    if (bookMaster.getIsbn().isEmpty()) {
+                        bookMaster.setIsbn(oldIsbn);
                     }
-                    bookMaster.updateBook(dbConnection, oldIsbn, newIsbn, newTitle, newAuthor, newQuantity, newCategory, newYear, "Available");
+                    bookMaster.updateBook(dbConnection, oldIsbn, bookMaster);
                     break;
                 case 3:
                     Scanner scan2 = new Scanner(System.in);
-                    bookMaster.displayBooks(dbConnection, "");
+                    bookMaster.displayBooks(dbConnection);
                     System.out.print("Enter Book ISBN : ");
                     String delIsbn = scan2.nextLine();
                     System.out.printf("%d Copies exist of this Book, How many do you wanna delete : ", bookMaster.getBookQuantity(dbConnection, delIsbn));
@@ -257,17 +260,42 @@ public class Main {
                     bookMaster.deleteBook(dbConnection, delIsbn, number);
                     break;
                 case 4:
-
+                    List<BorrowedBook> borrowedBooks = borrowedBookManager.displayBorrowedBooks(dbConnection);
+                    System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╦═════════════╦════════════════════════════════════════════════════════╗");
+                    System.out.println("\t        ║            Title               ║            Author            ║            ISBN             ║            Year             ║         Borrow_Date         ║               Due_Date                 ║");
+                    System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬══════════════════╬═════════════════════╣");
+                    for (BorrowedBook book : borrowedBooks) {
+                        System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %27s ║ %38s ║%n", book.getBookTitle(), book.getBookAuthor(), book.getBookIsbn(), book.getBookYear(), book.getBorrowDate(), book.getDueDate());
+                    }
+                    System.out.println("\t        ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
                     break;
                 case 5:
-                    bookMaster.bookStatistics(dbConnection);
+                    List<LostBook> lostBooks = lostBookManager.displayLostBooks(dbConnection);
+                    System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╗");
+                    System.out.println("\t        ║            Title               ║            Author            ║            ISBN             ║            Year             ║");
+                    System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╣");
+                    for (LostBook book : lostBooks) {
+                        System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %27s ║ %38s ║%n", book.getBookTitle(), book.getBookAuthor(), book.getBookIsbn(), book.getBookYear());
+                    }
+                    System.out.println("\t        ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
                     break;
                 case 6:
+                    int[] counts = bookMaster.bookStatistics(dbConnection);
+                    int availableBooksCount = counts[0];
+                    int borrowedBooksCount = counts[1];
+                    int lostBooksCount = counts[2];
+                    System.out.println("\t        ╔══════════════════════╦══════════════════╦══════════════════════╦══════════════════╦═════════════════════╦═══════════════╗");
+                    System.out.println("\t        ║            Total Available Books        ║            Total Borrowed Books         ║             Total Lost Books        ║");
+                    System.out.println("\t        ╠══════════════════════╬══════════════════╬══════════════════════╬══════════════════╬═════════════════════╬═══════════════╣");
+                    System.out.printf("\t        ║ %39s ║ %39s ║ %35s ║%n", availableBooksCount, borrowedBooksCount, lostBooksCount);
+                    System.out.println("\t        ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
+                    break;
+                case 7:
                     user_id = 0;
                     logout();
                     menu();
                     break;
-                case 7:
+                case 8:
                     quitApp();
                     break;
                 default:
