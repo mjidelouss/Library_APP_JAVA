@@ -27,11 +27,14 @@ public class BorrowedBooksRepository {
                 String bookCategory = resultSet.getString("category");
                 int bookYear = resultSet.getInt("year");
 
-                // Calculate the due date
+                if (hasBorrowedBook(borrowerId, isbn)) {
+                    System.out.println("You have already borrowed this book.");
+                    return null;
+                }
+
                 LocalDate currentDate = LocalDate.now();
                 LocalDate dueDate = currentDate.plusWeeks(1);
 
-                // Create a record of the borrowing with the due date
                 String insertRecordQuery = "INSERT INTO borrowedBooks (id, book_isbn, book_title, borrower_id, borrow_date, due_date, book_author, book_category, book_year) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
                 try (PreparedStatement insertRecordStatement = dbConnection.prepareStatement(insertRecordQuery)) {
@@ -65,9 +68,26 @@ public class BorrowedBooksRepository {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return null; // Return null if the book was not borrowed
+        return null;
     }
+    private boolean hasBorrowedBook(int borrowerId, String isbn) {
+        String checkBorrowedQuery = "SELECT COUNT(*) AS book_count FROM borrowedBooks WHERE borrower_id = ? AND book_isbn = ?";
+
+        try (PreparedStatement checkBorrowedStatement = dbConnection.prepareStatement(checkBorrowedQuery)) {
+            checkBorrowedStatement.setInt(1, borrowerId);
+            checkBorrowedStatement.setString(2, isbn);
+            ResultSet resultSet = checkBorrowedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                int bookCount = resultSet.getInt("book_count");
+                return bookCount > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 
     public BorrowedBook returnBook(int borrowerId, String isbn) {
         String selectRecordQuery = "SELECT * FROM borrowedBooks WHERE book_isbn = ? AND borrower_id = ?";

@@ -4,6 +4,9 @@ import com.library.app.infrastructure.DbConnection;
 import com.library.app.repository.*;
 import com.library.app.services.*;
 
+import java.io.Console;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.Scanner;
@@ -12,7 +15,7 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) throws InterruptedException {
         Connection dbConnection = DbConnection.connect();
-        menu();
+        art();
         if (dbConnection != null) {
             menu();
             try {
@@ -30,7 +33,6 @@ public class Main {
         Connection dbConnection = DbConnection.connect();
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            art();
             System.out.println('\t'+"                         ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██");
             System.out.println('\t'+"                         ██╗                                                               ██");
             System.out.println('\t'+"                         ██╗                     Welcome to YouCode's                      ██");
@@ -44,30 +46,31 @@ public class Main {
             System.out.println('\t'+"                         ██╗                                                              ═██");
             System.out.println('\t'+"                         ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██");
             int choice = scanner.nextInt();
-            User user = new User();
-            Member member = new Member();
-            Librarian librarian = new Librarian();
             MemberRepository memberRepository = new MemberRepository(dbConnection);
             MemberService memberService = new MemberService(memberRepository);
             UserRepository userRepository = new UserRepository(dbConnection);
             UserService userService = new UserService(userRepository);
+            Console console = System.console();
             switch (choice) {
                 case 1:
                     Scanner scan = new Scanner(System.in);
                     System.out.print("Enter Email : ");
                     String email = scan.nextLine();
-                    System.out.print("Enter Password : ");
-                    String password = scan.nextLine();
+                    char[] passwordArray = console.readPassword("Enter Password : ");
+                    String password = new String(passwordArray);
                     User loggedInUser = userService.login(email, password);
                     if (loggedInUser != null) {
                         int user_id = loggedInUser.getId();
                         if (memberService.checkMember(user_id)) {
+                            clearTerminal();
                             memberMenu(user_id);
                         } else {
+                            clearTerminal();
                             librarianMenu(user_id);
                         }
                     } else {
                         System.out.println("Wrong Credentials, Try Again.");
+                        waitForEnter();
                         menu();
                     }
                     break;
@@ -86,6 +89,7 @@ public class Main {
                     User loggedUser = userService.register(name, newEmail, newPassword, telephone, adresse);
                     if (loggedUser != null) {
                         int user_id = loggedUser.getId();
+                        clearTerminal();
                         memberMenu(user_id);
                     }
                     break;
@@ -94,22 +98,19 @@ public class Main {
                     break;
                 default:
                     System.out.println("Invalid choice. Please try again.");
+                    waitForEnter();
             }
         }
     }
 
     public static int memberMenu(int user_id) throws InterruptedException {
-        clearTerminal();
         Connection dbConnection = DbConnection.connect();
-        Book bookManager = new Book();
         BookRepository bookRepository = new BookRepository(dbConnection);
         BookService bookService = new BookService(bookRepository);
         BorrowedBooksRepository borrowedBooksRepository = new BorrowedBooksRepository(dbConnection);
         BorrowedBooksService borrowedBooksService = new BorrowedBooksService(borrowedBooksRepository);
-        BorrowedBook borrowedBookManager = new BorrowedBook();
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            art();
             System.out.println('\t'+"                         ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██");
             System.out.println('\t'+"                         ██╗                                                               ██");
             System.out.println('\t'+"                         ██╗                     Welcome to YouCode's                      ██");
@@ -126,7 +127,6 @@ public class Main {
             System.out.println('\t'+"                         ██╗                                                              ═██");
             System.out.println('\t'+"                         ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██");
             int choice = scanner.nextInt();
-            User user = new User();
             scanner.nextLine();
             switch (choice) {
                 case 1:
@@ -138,6 +138,8 @@ public class Main {
                         System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %35s ║%n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getYear(), book.getQuantity());
                     }
                     System.out.println("\t        ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
+                    waitForEnter();
+                    clearTerminal();
                     break;
                 case 2:
                     System.out.print("Search Term : ");
@@ -150,6 +152,8 @@ public class Main {
                         System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %35s ║%n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getYear(), book.getQuantity());
                     }
                     System.out.println("\t        ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
+                    waitForEnter();
+                    clearTerminal();
                     break;
                 case 3:
                     System.out.print("Enter ISBN : ");
@@ -160,6 +164,8 @@ public class Main {
                     System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬════════════════════════════════════════╣");
                         System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %38s ║%n", borrowedBook.getId(), borrowedBook.getBookTitle(), borrowedBook.getBookIsbn(), borrowedBook.getBorrowDate(), borrowedBook.getDueDate());
                     System.out.println("\t        ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
+                    waitForEnter();
+                    clearTerminal();
                     break;
                 case 4:
                     System.out.print("Enter ISBN : ");
@@ -172,17 +178,26 @@ public class Main {
                     System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╣");
                     System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║%n", returnedBook.getId(), returnedBook.getBookTitle(), returnedBook.getBookIsbn(), returnedDate);
                     System.out.println("\t        ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
+                    waitForEnter();
+                    clearTerminal();
                     break;
                 case 5:
                     user_id = 0;
+                    clearTerminal();
                     logout();
+                    waitForEnter();
                     menu();
                     break;
                 case 6:
+                    clearTerminal();
                     quitApp();
+                    waitForEnter();
+                    clearTerminal();
                     break;
                 default:
                     System.out.println("Invalid choice. Please try again.");
+                    waitForEnter();
+                    clearTerminal();
             }
         }
     }
@@ -195,13 +210,10 @@ public class Main {
         BookService bookService = new BookService(bookRepository);
         BorrowedBooksRepository borrowedBooksRepository = new BorrowedBooksRepository(dbConnection);
         BorrowedBooksService borrowedBooksService = new BorrowedBooksService(borrowedBooksRepository);
-        BorrowedBook borrowedBookManager = new BorrowedBook();
-        LostBook lostBookManager = new LostBook();
         LostBooksRepository lostBooksRepository = new LostBooksRepository(dbConnection);
         LostBooksService lostBooksService = new LostBooksService(lostBooksRepository);
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            art();
             System.out.println('\t'+"                         ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██");
             System.out.println('\t'+"                         ██╗                                                               ██");
             System.out.println('\t'+"                         ██╗                     Welcome to YouCode's                      ██");
@@ -240,6 +252,8 @@ public class Main {
                     scan.nextLine();
                     Book bookManager = new Book(title, author, isbn, quantity, category, year);
                     bookService.addBook(bookManager);
+                    waitForEnter();
+                    clearTerminal();
                     break;
                 case 2:
                     Scanner scan1 = new Scanner(System.in);
@@ -265,16 +279,20 @@ public class Main {
                         bookMaster.setIsbn(oldIsbn);
                     }
                     bookService.updateBook(oldIsbn, bookMaster);
+                    waitForEnter();
+                    clearTerminal();
                     break;
                 case 3:
                     Scanner scan2 = new Scanner(System.in);
                     bookService.displayBooks();
                     System.out.print("Enter Book ISBN : ");
                     String delIsbn = scan2.nextLine();
-                    System.out.printf("%d Copies exist of this Book, How many do you wanna delete : ", bookService.getBookQuantity(delIsbn));
+                    System.out.printf("%d Copies exist of this Book, How many do you want to delete : ", bookService.getBookQuantity(delIsbn));
                     int number = scan2.nextInt();
                     scan2.nextLine();
                     bookService.deleteBook(delIsbn, number);
+                    waitForEnter();
+                    clearTerminal();
                     break;
                 case 4:
                     List<BorrowedBook> borrowedBooks = borrowedBooksService.displayBorrowedBooks();
@@ -285,6 +303,8 @@ public class Main {
                         System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %27s ║ %38s ║%n", book.getBookTitle(), book.getBookAuthor(), book.getBookIsbn(), book.getBookYear(), book.getBorrowDate(), book.getDueDate());
                     }
                     System.out.println("\t        ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
+                    waitForEnter();
+                    clearTerminal();
                     break;
                 case 5:
                     List<LostBook> lostBooks = lostBooksService.displayLostBooks();
@@ -295,28 +315,45 @@ public class Main {
                         System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %27s ║ %38s ║%n", book.getBookTitle(), book.getBookAuthor(), book.getBookIsbn(), book.getBookYear());
                     }
                     System.out.println("\t        ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
+                    waitForEnter();
+                    clearTerminal();
                     break;
                 case 6:
                     int[] counts = bookService.bookStatistics();
                     int availableBooksCount = counts[0];
                     int borrowedBooksCount = counts[1];
                     int lostBooksCount = counts[2];
-                    System.out.println("\t        ╔══════════════════════╦══════════════════╦══════════════════════╦══════════════════╦═════════════════════╦═══════════════╗");
-                    System.out.println("\t        ║            Total Available Books        ║            Total Borrowed Books         ║             Total Lost Books        ║");
-                    System.out.println("\t        ╠══════════════════════╬══════════════════╬══════════════════════╬══════════════════╬═════════════════════╬═══════════════╣");
-                    System.out.printf("\t        ║ %39s ║ %39s ║ %35s ║%n", availableBooksCount, borrowedBooksCount, lostBooksCount);
-                    System.out.println("\t        ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
+                    try (FileWriter writer = new FileWriter("./statistiques.txt")) {
+                        writer.write("\t        ╔══════════════════════╦══════════════════╦══════════════════════╦══════════════════╦═════════════════════╦═══════════════╗\n");
+                        writer.write("\t        ║            Total Available Books        ║            Total Borrowed Books         ║             Total Lost Books        ║\n");
+                        writer.write("\t        ╠══════════════════════╬══════════════════╬══════════════════════╬══════════════════╬═════════════════════╬═══════════════╣\n");
+                        writer.write(String.format("\t        ║ %39s ║ %39s ║ %35s ║%n", availableBooksCount, borrowedBooksCount, lostBooksCount));
+                        writer.write("\t        ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝\n");
+
+                        System.out.println("Statistics saved to " + "./statistiques.txt");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    waitForEnter();
+                    clearTerminal();
                     break;
                 case 7:
                     user_id = 0;
+                    clearTerminal();
                     logout();
+                    waitForEnter();
                     menu();
                     break;
                 case 8:
+                    clearTerminal();
                     quitApp();
+                    waitForEnter();
+                    clearTerminal();
                     break;
                 default:
                     System.out.println("Invalid choice. Please try again.");
+                    waitForEnter();
+                    clearTerminal();
             }
         }
     }
@@ -366,10 +403,9 @@ public class Main {
         };
         for (String line : lines) {
             System.out.println(line);
-            Thread.sleep(220); // Sleep for 500 milliseconds between lines
+            Thread.sleep(220);
         }
     }
-
     public static void waitForEnter() {
         System.out.println("Press Enter to continue...");
         Scanner scanner = new Scanner(System.in);
