@@ -1,6 +1,7 @@
 package com.library.app.repository;
 
 import com.library.app.domain.BorrowedBook;
+import com.library.app.domain.enums.Colors;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -28,7 +29,7 @@ public class BorrowedBooksRepository {
                 int bookYear = resultSet.getInt("year");
 
                 if (hasBorrowedBook(borrowerId, isbn)) {
-                    System.out.println("You have already borrowed this book.");
+                    System.out.println(Colors.BROWN.getColor() +"\n\nYou have already borrowed this book.");
                     return null;
                 }
 
@@ -56,14 +57,14 @@ public class BorrowedBooksRepository {
                     insertRecordStatement.setInt(9, bookYear);
                     insertRecordStatement.executeUpdate();
 
-                    System.out.println("Book with ISBN " + isbn + " has been borrowed by borrower ID " + borrowerId + ".");
-                    System.out.println("Due Date: " + dueDate);
+                    System.out.println(Colors.GREEN.getColor() +"\n\nBook with ISBN " + isbn + " has been borrowed by borrower ID " + borrowerId + ".");
+                    System.out.println(Colors.GREEN.getColor() +"\nDue Date: " + dueDate);
 
                     // Create and return the borrowed book object without borrower ID
                     return new BorrowedBook(bookId, isbn, bookTitle, borrowDate, dueDate, bookAuthor, bookCategory, bookYear);
                 }
             } else {
-                System.out.println("Book with ISBN " + isbn + " is not available for borrowing.");
+                System.out.println(Colors.RED.getColor() +"\n\nBook with ISBN " + isbn + " is not available for borrowing.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -115,12 +116,12 @@ public class BorrowedBooksRepository {
                     int rowsAffected = deleteRecordStatement.executeUpdate();
 
                     if (rowsAffected > 0) {
-                        System.out.println("Book with ISBN " + isbn + " has been returned by borrower ID " + borrowerId + ".");
+                        System.out.println(Colors.GREEN.getColor() +"\n\nBook with ISBN " + isbn + " has been returned by borrower ID " + borrowerId + ".");
                         return new BorrowedBook(recordId, isbn, bookTitle, borrowDate, dueDate, bookAuthor, bookCategory, bookYear);
                     }
                 }
             } else {
-                System.out.println("No matching record found for the book with ISBN " + isbn + " and borrower ID " + borrowerId + ".");
+                System.out.println(Colors.RED.getColor() +"\n\nNo matching record found for the book with ISBN " + isbn + " and borrower ID " + borrowerId + ".");
             }
         } catch (SQLException e) {
             e.printStackTrace();

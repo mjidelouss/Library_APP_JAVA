@@ -1,7 +1,7 @@
 package com.library.app.repository;
 
 import com.library.app.domain.Book;
-
+import com.library.app.domain.enums.Colors;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,11 +34,11 @@ public class BookRepository {
                     updateQuantityStatement.setInt(1, newQuantity);
                     updateQuantityStatement.setInt(2, existingBookId);
                     updateQuantityStatement.executeUpdate();
-                    System.out.println("Book with ISBN " + isbn + " already exists. Quantity updated.");
+                    System.out.println(Colors.GREEN.getColor() +"\n\nBook with ISBN " + isbn + " already exists. Quantity updated.");
                 }
             } else {
                 // Insert a new book if ISBN doesn't exist
-                String insertQuery = "INSERT INTO books (title, author, isbn, quantity, category, year) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                String insertQuery = "INSERT INTO books (title, author, isbn, quantity, category, year) VALUES (?, ?, ?, ?, ?, ?)";
                 try (PreparedStatement preparedStatement = dbConnection.prepareStatement(insertQuery)) {
                     preparedStatement.setString(1, book.getTitle());
                     preparedStatement.setString(2, book.getAuthor());
@@ -50,9 +50,9 @@ public class BookRepository {
                     int rowsAffected = preparedStatement.executeUpdate();
                     if (rowsAffected > 0) {
                         addedBook = new Book(book.getTitle(), book.getAuthor(), isbn, book.getQuantity(), book.getCategory(), book.getYear());
-                        System.out.println("New book added successfully.");
+                        System.out.println(Colors.GREEN.getColor() +"\n\nNew book added successfully.");
                     } else {
-                        System.out.println("Failed to add the book.");
+                        System.out.println(Colors.RED.getColor() +"\n\nFailed to add the book.");
                     }
                 }
             }
@@ -97,13 +97,13 @@ public class BookRepository {
                     int rowsAffected = updateStatement.executeUpdate();
                     if (rowsAffected > 0) {
                         updatedBook = new Book(book.getTitle(), book.getAuthor(), book.getIsbn(), book.getQuantity(), book.getCategory(), book.getYear());
-                        System.out.println("Book with ISBN " + book.getIsbn() + " updated successfully.");
+                        System.out.println(Colors.GREEN.getColor() +"\n\nBook with ISBN " + book.getIsbn() + " updated successfully.");
                     } else {
-                        System.out.println("No book found with ISBN " + book.getIsbn() + ". Update failed.");
+                        System.out.println(Colors.RED.getColor() +"\n\nNo book found with ISBN " + book.getIsbn() + ". Update failed.");
                     }
                 }
             } else {
-                System.out.println("No book found with ISBN " + book.getIsbn() + ". Update failed.");
+                System.out.println(Colors.RED.getColor() +"\n\nNo book found with ISBN " + book.getIsbn() + ". Update failed.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -143,14 +143,14 @@ public class BookRepository {
                         deleteStatement.executeUpdate();
                     }
 
-                    System.out.println("Successfully deleted " + quantity + " copies of the book with ISBN " + isbn + ".");
+                    System.out.println(Colors.GREEN.getColor() +"\n\nSuccessfully deleted " + quantity + " copies of the book with ISBN " + isbn + ".");
                     return true;
                 } else {
-                    System.out.println("Insufficient quantity. Unable to delete " + quantity + " copies of the book with ISBN " + isbn + ".");
+                    System.out.println(Colors.RED.getColor() +"\n\nInsufficient quantity. Unable to delete " + quantity + " copies of the book with ISBN " + isbn + ".");
                     return false;
                 }
             } else {
-                System.out.println("No book found with ISBN " + isbn + ".");
+                System.out.println(Colors.RED.getColor() +"\n\nNo book found with ISBN " + isbn + ".");
                 return false;
             }
         } catch (SQLException e) {

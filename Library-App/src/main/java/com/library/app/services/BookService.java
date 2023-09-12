@@ -40,4 +40,17 @@ public class BookService {
     public int getBookQuantity(String isbn) {
         return this.bookRepository.getBookQuantity(isbn);
     }
+
+    public Boolean isValidBookData(String title, String author, String isbn, String category, int year, int quantity) {
+        if (title != null && author != null && isbn != null && category != null && year != 0 && quantity != 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean isValidISBN(String isbn) {
+        String regex = "^[A-Z]\\d{0,9}$";
+        return isbn.matches(regex);
+    }
 }

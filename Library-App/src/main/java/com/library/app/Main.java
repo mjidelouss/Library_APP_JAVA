@@ -1,9 +1,10 @@
 package com.library.app;
 import com.library.app.domain.*;
+import com.library.app.domain.enums.Colors;
 import com.library.app.infrastructure.DbConnection;
 import com.library.app.repository.*;
+import com.library.app.ressources.Ressource;
 import com.library.app.services.*;
-
 import java.io.Console;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,9 +14,10 @@ import java.util.Scanner;
 import java.util.List;
 
 public class Main {
+
+
     public static void main(String[] args) throws InterruptedException {
         Connection dbConnection = DbConnection.connect();
-        art();
         if (dbConnection != null) {
             menu();
             try {
@@ -24,27 +26,17 @@ public class Main {
                 e.printStackTrace();
             }
         } else {
-            System.out.println("Failed to connect to the database.");
+            System.out.println(Colors.RED.getColor() + "\nFailed to connect to the database.");
         }
     }
 
     public static int menu() throws InterruptedException {
-        clearTerminal();
+        Ressource.clearTerminal();
         Connection dbConnection = DbConnection.connect();
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.println('\t'+"                         ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██");
-            System.out.println('\t'+"                         ██╗                                                               ██");
-            System.out.println('\t'+"                         ██╗                     Welcome to YouCode's                      ██");
-            System.out.println('\t'+"                         ██╗                        Library System                         ██");
-            System.out.println('\t'+"                         ██╗                                                               ██");
-            System.out.println('\t'+"                         ██╗ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ █ ██ ██ ██ ██");
-            System.out.println('\t'+"                         ██╗                                                              ═██");
-            System.out.println('\t'+"                         ██╗ 1- Login.                                                    ═██");
-            System.out.println('\t'+"                         ██╗ 2- Register.                                                 ═██");
-            System.out.println('\t'+"                         ██╗ 3- Quit.                                                     ═██");
-            System.out.println('\t'+"                         ██╗                                                              ═██");
-            System.out.println('\t'+"                         ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██");
+            Ressource.printUserMenu();
+            System.out.print(Colors.PURPLE.getColor() +"\n\nEnter Your Choice : " + Colors.RESET.getColor());
             int choice = scanner.nextInt();
             MemberRepository memberRepository = new MemberRepository(dbConnection);
             MemberService memberService = new MemberService(memberRepository);
@@ -54,51 +46,57 @@ public class Main {
             switch (choice) {
                 case 1:
                     Scanner scan = new Scanner(System.in);
-                    System.out.print("Enter Email : ");
+                    System.out.print(Colors.PURPLE.getColor() +"\n\nEnter Email : " + Colors.RESET.getColor());
                     String email = scan.nextLine();
-                    char[] passwordArray = console.readPassword("Enter Password : ");
+                    char[] passwordArray = console.readPassword(Colors.PURPLE.getColor() + "Enter Password : "+Colors.RESET.getColor());
                     String password = new String(passwordArray);
                     User loggedInUser = userService.login(email, password);
                     if (loggedInUser != null) {
                         int user_id = loggedInUser.getId();
                         if (memberService.checkMember(user_id)) {
-                            clearTerminal();
+                            Ressource.clearTerminal();
                             memberMenu(user_id);
                         } else {
-                            clearTerminal();
+                            Ressource.clearTerminal();
                             librarianMenu(user_id);
                         }
                     } else {
-                        System.out.println("Wrong Credentials, Try Again.");
-                        waitForEnter();
+                        System.out.println(Colors.RED.getColor() +"\n\nWrong Credentials, Try Again.");
+                        Ressource.waitForEnter();
                         menu();
                     }
                     break;
                 case 2:
                     Scanner scan1 = new Scanner(System.in);
-                    System.out.print("Name : ");
+                    System.out.print(Colors.PURPLE.getColor() +"Name : " + Colors.RESET.getColor());
                     String name = scan1.nextLine();
-                    System.out.print("Telephone : ");
+                    System.out.print(Colors.PURPLE.getColor() +"Telephone : " + Colors.RESET.getColor());
                     String telephone = scan1.nextLine();
-                    System.out.print("Adresse : ");
+                    System.out.print(Colors.PURPLE.getColor() +"Adresse : " + Colors.RESET.getColor());
                     String adresse = scan1.nextLine();
-                    System.out.print("Email : ");
+                    System.out.print(Colors.PURPLE.getColor() +"Email : " + Colors.RESET.getColor());
                     String newEmail = scan1.nextLine();
-                    System.out.print("Password : ");
+                    System.out.print(Colors.PURPLE.getColor() +"Password : " + Colors.RESET.getColor());
                     String newPassword = scan1.nextLine();
-                    User loggedUser = userService.register(name, newEmail, newPassword, telephone, adresse);
-                    if (loggedUser != null) {
-                        int user_id = loggedUser.getId();
-                        clearTerminal();
-                        memberMenu(user_id);
+                    if (userService.isValidRegisterData(name, telephone, adresse, newEmail, newPassword)) {
+                        User loggedUser = userService.register(name, newEmail, newPassword, telephone, adresse);
+                        if (loggedUser != null) {
+                            int user_id = loggedUser.getId();
+                            Ressource.clearTerminal();
+                            memberMenu(user_id);
+                        }
+                    } else {
+                        System.out.println(Colors.RED.getColor() +"\n\nFill out all the fields");
+                        Ressource.waitForEnter();
+                        menu();
                     }
                     break;
                 case 3:
-                    quitApp();
+                    Ressource.quitApp();
                     break;
                 default:
-                    System.out.println("Invalid choice. Please try again.");
-                    waitForEnter();
+                    System.out.println(Colors.RED.getColor() +"\n\nInvalid choice. Please try again.");
+                    Ressource.waitForEnter();
             }
         }
     }
@@ -111,99 +109,90 @@ public class Main {
         BorrowedBooksService borrowedBooksService = new BorrowedBooksService(borrowedBooksRepository);
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.println('\t'+"                         ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██");
-            System.out.println('\t'+"                         ██╗                                                               ██");
-            System.out.println('\t'+"                         ██╗                     Welcome to YouCode's                      ██");
-            System.out.println('\t'+"                         ██╗                        Library System                         ██");
-            System.out.println('\t'+"                         ██╗                                                               ██");
-            System.out.println('\t'+"                         ██╗ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ █ ██ ██ ██ ██");
-            System.out.println('\t'+"                         ██╗                                                              ═██");
-            System.out.println('\t'+"                         ██╗ 1- Display the list of Available Books.                      ═██");
-            System.out.println('\t'+"                         ██╗ 2- Search for a Book.                                        ═██");
-            System.out.println('\t'+"                         ██╗ 3- Borrow a Book.                                            ═██");
-            System.out.println('\t'+"                         ██╗ 4- Return a Borrowed Book.                                   ═██");
-            System.out.println('\t'+"                         ██╗ 5- Disconnect.                                               ═██");
-            System.out.println('\t'+"                         ██╗ 6- Quit.                                                     ═██");
-            System.out.println('\t'+"                         ██╗                                                              ═██");
-            System.out.println('\t'+"                         ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██");
+            Ressource.printMemberMenu();
+            System.out.print(Colors.PURPLE.getColor() +"\n\nEnter Your Choice : " + Colors.RESET.getColor());
             int choice = scanner.nextInt();
             scanner.nextLine();
             switch (choice) {
                 case 1:
                     List<Book> books = bookService.displayBooks();
-                    System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═════════════════════════════════════════════════════╗");
-                    System.out.println("\t        ║            Title               ║            Author            ║            ISBN             ║            Year             ║            Quantity                 ║");
-                    System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════════════════════════════╣");
+                    System.out.print("\n\n");
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═════════════════════════════════════════════════════╗");
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ║            Title               ║            Author            ║            ISBN             ║            Year             ║            Quantity                 ║");
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════════════════════════════╣");
                     for (Book book : books) {
-                        System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %35s ║%n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getYear(), book.getQuantity());
+                        System.out.printf('\t'+ Colors.CYAN.getColor() +"        ║"+ Colors.YELLOW.getColor() +" %30s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %28s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %35s "+ Colors.CYAN.getColor() +"║%n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getYear(), book.getQuantity());
                     }
-                    System.out.println("\t        ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
-                    waitForEnter();
-                    clearTerminal();
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
+                    Ressource.waitForEnter();
+                    Ressource.clearTerminal();
                     break;
                 case 2:
-                    System.out.print("Search Term : ");
+                    System.out.print(Colors.PURPLE.getColor() +"Search Term : " + Colors.RESET.getColor());
                     String searchTerm = scanner.nextLine();
                     List<Book> searchedBooks = bookService.searchBook(searchTerm);
-                    System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╦═════════════════════════════════════╗");
-                    System.out.println("\t        ║            Title               ║            Author            ║            ISBN             ║            Year             ║            Quantity                 ║");
-                    System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════════════════════════════╣");
+                    System.out.print("\n\n");
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╦═════════════════════════════════════╗");
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ║            Title               ║            Author            ║            ISBN             ║            Year             ║            Quantity                 ║");
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════════════════════════════╣");
                     for (Book book : searchedBooks) {
-                        System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %35s ║%n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getYear(), book.getQuantity());
+                        System.out.printf('\t'+ Colors.CYAN.getColor() +"        ║"+ Colors.YELLOW.getColor() +" %30s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %28s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %35s "+ Colors.CYAN.getColor() +"║%n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getYear(), book.getQuantity());
                     }
-                    System.out.println("\t        ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
-                    waitForEnter();
-                    clearTerminal();
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
+                    Ressource.waitForEnter();
+                    Ressource.clearTerminal();
                     break;
                 case 3:
-                    System.out.print("Enter ISBN : ");
+                    System.out.print(Colors.PURPLE.getColor() +"Enter ISBN : " + Colors.RESET.getColor());
                     String borrowIsbn = scanner.nextLine();
                     BorrowedBook borrowedBook = borrowedBooksService.borrowBook(user_id, borrowIsbn);
-                    System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦════════════════════════════════════════════════════════╗");
-                    System.out.println("\t        ║           Book ID              ║            Title             ║            ISBN             ║         Borrow_Date         ║            Due_Date                    ║");
-                    System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬════════════════════════════════════════╣");
-                        System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %38s ║%n", borrowedBook.getId(), borrowedBook.getBookTitle(), borrowedBook.getBookIsbn(), borrowedBook.getBorrowDate(), borrowedBook.getDueDate());
-                    System.out.println("\t        ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
-                    waitForEnter();
-                    clearTerminal();
+                    System.out.print("\n\n");
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦════════════════════════════════════════════════════════╗");
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ║           Book ID              ║            Title             ║            ISBN             ║         Borrow_Date         ║            Due_Date                    ║");
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬════════════════════════════════════════╣");
+                    System.out.printf('\t'+ Colors.CYAN.getColor() +"        ║"+ Colors.YELLOW.getColor() +" %30s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %28s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %38s "+ Colors.CYAN.getColor() +"║%n", borrowedBook.getId(), borrowedBook.getBookTitle(), borrowedBook.getBookIsbn(), borrowedBook.getBorrowDate(), borrowedBook.getDueDate());
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
+                    Ressource.waitForEnter();
+                    Ressource.clearTerminal();
                     break;
                 case 4:
-                    System.out.print("Enter ISBN : ");
+                    System.out.print(Colors.PURPLE.getColor() +"Enter ISBN : " + Colors.RESET.getColor());
                     String returnIsbn = scanner.nextLine();
                     BorrowedBook returnedBook = borrowedBooksService.returnBook(user_id, returnIsbn);
                     LocalDate todayDate = LocalDate.now();
                     Date returnedDate = Date.valueOf(todayDate);
-                    System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╗");
-                    System.out.println("\t        ║            Book ID             ║            Title             ║            ISBN             ║        Returned_Date        ║");
-                    System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╣");
-                    System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║%n", returnedBook.getId(), returnedBook.getBookTitle(), returnedBook.getBookIsbn(), returnedDate);
-                    System.out.println("\t        ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
-                    waitForEnter();
-                    clearTerminal();
+                    System.out.print("\n\n");
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╗");
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ║            Book ID             ║            Title             ║            ISBN             ║        Returned_Date        ║");
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╣");
+                    System.out.printf('\t'+ Colors.CYAN.getColor() +"        ║"+ Colors.YELLOW.getColor() +" %30s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %28s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║%n", returnedBook.getId(), returnedBook.getBookTitle(), returnedBook.getBookIsbn(), returnedDate);
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
+                    Ressource.waitForEnter();
+                    Ressource.clearTerminal();
                     break;
                 case 5:
                     user_id = 0;
-                    clearTerminal();
-                    logout();
-                    waitForEnter();
+                    Ressource.clearTerminal();
+                    Ressource.logout();
+                    Ressource.waitForEnter();
                     menu();
                     break;
                 case 6:
-                    clearTerminal();
-                    quitApp();
-                    waitForEnter();
-                    clearTerminal();
+                    Ressource.clearTerminal();
+                    Ressource.quitApp();
+                    Ressource.waitForEnter();
+                    Ressource.clearTerminal();
                     break;
                 default:
-                    System.out.println("Invalid choice. Please try again.");
-                    waitForEnter();
-                    clearTerminal();
+                    System.out.println(Colors.RED.getColor() +"Invalid choice. Please try again.");
+                    Ressource.waitForEnter();
+                    Ressource.clearTerminal();
             }
         }
     }
 
     public static void librarianMenu(int user_id) throws InterruptedException {
-        clearTerminal();
+        Ressource.clearTerminal();
         Connection dbConnection = DbConnection.connect();
         Book bookMaster = new Book();
         BookRepository bookRepository = new BookRepository(dbConnection);
@@ -214,109 +203,100 @@ public class Main {
         LostBooksService lostBooksService = new LostBooksService(lostBooksRepository);
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.println('\t'+"                         ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██");
-            System.out.println('\t'+"                         ██╗                                                               ██");
-            System.out.println('\t'+"                         ██╗                     Welcome to YouCode's                      ██");
-            System.out.println('\t'+"                         ██╗                        Library System                         ██");
-            System.out.println('\t'+"                         ██╗                                                               ██");
-            System.out.println('\t'+"                         ██╗ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ █ ██ ██ ██ ██");
-            System.out.println('\t'+"                         ██╗                                                              ═██");
-            System.out.println('\t'+"                         ██╗ 1- Add a new Book          .                                 ═██");
-            System.out.println('\t'+"                         ██╗ 2- Modify an existing Book.                                  ═██");
-            System.out.println('\t'+"                         ██╗ 3- Delete a Book.                                            ═██");
-            System.out.println('\t'+"                         ██╗ 4- Display List of borrowed Books.                           ═██");
-            System.out.println('\t'+"                         ██╗ 5- Display List of Lost Books.                               ═██");
-            System.out.println('\t'+"                         ██╗ 6- Generate Books Statistics report.                         ═██");
-            System.out.println('\t'+"                         ██╗ 7- Disconnect.                                               ═██");
-            System.out.println('\t'+"                         ██╗ 8- Quit.                                                     ═██");
-            System.out.println('\t'+"                         ██╗                                                              ═██");
-            System.out.println('\t'+"                         ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██ ██");
+            Ressource.printLibrarianMenu();
+            System.out.print(Colors.PURPLE.getColor() +"\n\nEnter Your Choice : " + Colors.RESET.getColor());
             int choice = scanner.nextInt();
             scanner.nextLine();
             switch (choice) {
                 case 1:
                     Scanner scan = new Scanner(System.in);
-                    System.out.print("Title : ");
+                    System.out.print(Colors.PURPLE.getColor() +"\n\nTitle : " + Colors.RESET.getColor());
                     String title = scan.nextLine();
-                    System.out.print("Author : ");
+                    System.out.print(Colors.PURPLE.getColor() +"Author : " + Colors.RESET.getColor());
                     String author = scan.nextLine();
-                    System.out.print("ISBN : ");
+                    System.out.print(Colors.PURPLE.getColor() +"ISBN : " + Colors.RESET.getColor());
                     String isbn = scan.nextLine();
-                    System.out.print("Quantity : ");
+                    System.out.print(Colors.PURPLE.getColor() +"Quantity : " + Colors.RESET.getColor());
                     int quantity = scan.nextInt();
                     scan.nextLine();
-                    System.out.print("Category : ");
+                    System.out.print(Colors.PURPLE.getColor() +"Category : " + Colors.RESET.getColor());
                     String category = scan.nextLine();
-                    System.out.print("Year : ");
+                    System.out.print(Colors.PURPLE.getColor() +"Year : " + Colors.RESET.getColor());
                     int year = scan.nextInt();
                     scan.nextLine();
-                    Book bookManager = new Book(title, author, isbn, quantity, category, year);
-                    bookService.addBook(bookManager);
-                    waitForEnter();
-                    clearTerminal();
+                    if (bookService.isValidBookData(title, author, isbn, category, year, quantity)) {
+                        Book bookManager = new Book(title, author, isbn, quantity, category, year);
+                        bookService.addBook(bookManager);
+                    } else {
+                        System.out.println(Colors.RED.getColor() +"\n\nFill out all the fields");
+                    }
+                    Ressource.waitForEnter();
+                    Ressource.clearTerminal();
                     break;
                 case 2:
                     Scanner scan1 = new Scanner(System.in);
                     bookService.displayBooks();
-                    System.out.print("Enter Book ISBN : ");
+                    System.out.print(Colors.PURPLE.getColor() +"Enter Book ISBN : " + Colors.RESET.getColor());
                     String oldIsbn = scan1.nextLine();
-                    System.out.print("New Title : ");
+                    System.out.print(Colors.PURPLE.getColor() +"New Title : " + Colors.RESET.getColor());
                     bookMaster.setTitle(scan1.nextLine());
-                    System.out.print("New Author : ");
+                    System.out.print(Colors.PURPLE.getColor() +"New Author : " + Colors.RESET.getColor());
                     bookMaster.setAuthor(scan1.nextLine());
-                    System.out.print("New ISBN : ");
+                    System.out.print(Colors.PURPLE.getColor() +"New ISBN : " + Colors.RESET.getColor());
                     bookMaster.setIsbn(scan1.nextLine());
-                    System.out.print("New Quantity : ");
+                    System.out.print(Colors.PURPLE.getColor() +"New Quantity : " + Colors.RESET.getColor());
                     bookMaster.setQuantity(scan1.nextInt());
                     scan1.nextLine();
-                    System.out.print("New Category : ");
+                    System.out.print(Colors.PURPLE.getColor() +"New Category : " + Colors.RESET.getColor());
                     bookMaster.setCategory(scan1.nextLine());
                     scan1.nextLine();
-                    System.out.print("New Year : ");
+                    System.out.print(Colors.PURPLE.getColor() +"New Year : " + Colors.RESET.getColor());
                     bookMaster.setYear(scan1.nextInt());
                     scan1.nextLine();
                     if (bookMaster.getIsbn().isEmpty()) {
                         bookMaster.setIsbn(oldIsbn);
                     }
                     bookService.updateBook(oldIsbn, bookMaster);
-                    waitForEnter();
-                    clearTerminal();
+                    Ressource.waitForEnter();
+                    Ressource.clearTerminal();
                     break;
                 case 3:
                     Scanner scan2 = new Scanner(System.in);
                     bookService.displayBooks();
-                    System.out.print("Enter Book ISBN : ");
+                    System.out.print(Colors.PURPLE.getColor() +"Enter Book ISBN : " + Colors.RESET.getColor());
                     String delIsbn = scan2.nextLine();
                     System.out.printf("%d Copies exist of this Book, How many do you want to delete : ", bookService.getBookQuantity(delIsbn));
                     int number = scan2.nextInt();
                     scan2.nextLine();
                     bookService.deleteBook(delIsbn, number);
-                    waitForEnter();
-                    clearTerminal();
+                    Ressource.waitForEnter();
+                    Ressource.clearTerminal();
                     break;
                 case 4:
                     List<BorrowedBook> borrowedBooks = borrowedBooksService.displayBorrowedBooks();
-                    System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╦═════════════╦════════════════════════════════════════════════════════╗");
-                    System.out.println("\t        ║            Title               ║            Author            ║            ISBN             ║            Year             ║         Borrow_Date         ║               Due_Date                 ║");
-                    System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬══════════════════╬═════════════════════╣");
+                    System.out.print("\n\n");
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╦═════════════╦════════════════════════════════════════════════════════╗");
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"║            Title               ║            Author            ║            ISBN             ║            Year             ║         Borrow_Date         ║               Due_Date                 ║");
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬══════════════════╬═════════════════════╣");
                     for (BorrowedBook book : borrowedBooks) {
-                        System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %27s ║ %38s ║%n", book.getBookTitle(), book.getBookAuthor(), book.getBookIsbn(), book.getBookYear(), book.getBorrowDate(), book.getDueDate());
+                        System.out.printf('\t'+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %30s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %28s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %38s "+ Colors.CYAN.getColor() +"║%n", book.getBookTitle(), book.getBookAuthor(), book.getBookIsbn(), book.getBookYear(), book.getBorrowDate(), book.getDueDate());
                     }
-                    System.out.println("\t        ╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
-                    waitForEnter();
-                    clearTerminal();
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
+                    Ressource.waitForEnter();
+                    Ressource.clearTerminal();
                     break;
                 case 5:
                     List<LostBook> lostBooks = lostBooksService.displayLostBooks();
-                    System.out.println("\t        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╗");
-                    System.out.println("\t        ║            Title               ║            Author            ║            ISBN             ║            Year             ║");
-                    System.out.println("\t        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╣");
+                    System.out.print("\n\n");
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╗");
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ║            Title               ║            Author            ║            ISBN             ║            Year             ║");
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╣");
                     for (LostBook book : lostBooks) {
-                        System.out.printf("\t        ║ %30s ║ %28s ║ %27s ║ %27s ║ %27s ║ %38s ║%n", book.getBookTitle(), book.getBookAuthor(), book.getBookIsbn(), book.getBookYear());
+                        System.out.printf('\t'+ Colors.CYAN.getColor() +"        ║"+ Colors.YELLOW.getColor() +" %30s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %28s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %38s "+ Colors.CYAN.getColor() +"║%n", book.getBookTitle(), book.getBookAuthor(), book.getBookIsbn(), book.getBookYear());
                     }
-                    System.out.println("\t        ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
-                    waitForEnter();
-                    clearTerminal();
+                    System.out.println('\t'+ Colors.CYAN.getColor() +"        ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
+                    Ressource.waitForEnter();
+                    Ressource.clearTerminal();
                     break;
                 case 6:
                     int[] counts = bookService.bookStatistics();
@@ -330,89 +310,31 @@ public class Main {
                         writer.write(String.format("\t        ║ %39s ║ %39s ║ %35s ║%n", availableBooksCount, borrowedBooksCount, lostBooksCount));
                         writer.write("\t        ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝\n");
 
-                        System.out.println("Statistics saved to " + "./statistiques.txt");
+                        System.out.println(Colors.GREEN.getColor() +"Statistics saved to " + "./statistiques.txt");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    waitForEnter();
-                    clearTerminal();
+                    Ressource.waitForEnter();
+                    Ressource.clearTerminal();
                     break;
                 case 7:
                     user_id = 0;
-                    clearTerminal();
-                    logout();
-                    waitForEnter();
+                    Ressource.clearTerminal();
+                    Ressource.logout();
+                    Ressource.waitForEnter();
                     menu();
                     break;
                 case 8:
-                    clearTerminal();
-                    quitApp();
-                    waitForEnter();
-                    clearTerminal();
+                    Ressource.clearTerminal();
+                    Ressource.quitApp();
+                    Ressource.waitForEnter();
+                    Ressource.clearTerminal();
                     break;
                 default:
-                    System.out.println("Invalid choice. Please try again.");
-                    waitForEnter();
-                    clearTerminal();
+                    System.out.println(Colors.RED.getColor() +"\nInvalid choice. Please try again.");
+                    Ressource.waitForEnter();
+                    Ressource.clearTerminal();
             }
         }
-    }
-    public static void art() throws InterruptedException {
-        String[] lines = {
-                '\t'+"      ██╗   ██╗ ██████╗ ██╗   ██╗ ██████╗ ██████╗ ██████╗ ███████╗    ██╗     ██╗██████╗ ██████╗  █████╗ ██████╗ ██╗   ██╗",
-                '\t'+"      ╚██╗ ██╔╝██╔═══██╗██║   ██║██╔════╝██╔═══██╗██╔══██╗██╔════╝    ██║     ██║██╔══██╗██╔══██╗██╔══██╗██╔══██╗╚██╗ ██╔╝",
-                '\t'+"       ╚████╔╝ ██║   ██║██║   ██║██║     ██║   ██║██║  ██║█████╗      ██║     ██║██████╔╝██████╔╝███████║██████╔╝ ╚████╔╝ ",
-                '\t'+"        ╚██╔╝  ██║   ██║██║   ██║██║     ██║   ██║██║  ██║██╔══╝      ██║     ██║██╔══██╗██╔══██╗██╔══██║██╔══██╗  ╚██╔╝  ",
-                '\t'+"         ██║   ╚██████╔╝╚██████╔╝╚██████╗╚██████╔╝██████╔╝███████╗    ███████╗██║██████╔╝██║  ██║██║  ██║██║  ██║   ██║   ",
-                '\t'+"         ╚═╝    ╚═════╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝    ╚══════╝╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ",
-        };
-        for (String line : lines) {
-            System.out.println(line);
-            Thread.sleep(220); // Sleep for 500 milliseconds between lines
-        }
-    }
-
-    public static void quitApp() throws InterruptedException {
-        String[] lines = {
-                '\t'+"                          ██████╗  ██████╗  ██████╗ ██████╗ ██████╗ ██╗   ██╗███████╗    ██╗",
-                '\t'+"                         ██╔════╝ ██╔═══██╗██╔═══██╗██╔══██╗██╔══██╗╚██╗ ██╔╝██╔════╝    ██║",
-                '\t'+"                         ██║  ███╗██║   ██║██║   ██║██║  ██║██████╔╝ ╚████╔╝ █████╗      ██║",
-                '\t'+"                         ██║   ██║██║   ██║██║   ██║██║  ██║██╔══██╗  ╚██╔╝  ██╔══╝      ╚═╝",
-                '\t'+"                         ╚██████╔╝╚██████╔╝╚██████╔╝██████╔╝██████╔╝   ██║   ███████╗    ██╗",
-                '\t'+"                          ╚═════╝  ╚═════╝  ╚═════╝ ╚═════╝ ╚═════╝    ╚═╝   ╚══════╝    ╚═╝",
-        };
-        for (String line : lines) {
-            System.out.println(line);
-            Thread.sleep(220); // Sleep for 500 milliseconds between lines
-        }
-        System.exit(0);
-    }
-    public static void logout() throws InterruptedException {
-        String[] lines = {
-                '\t'+"               █████                                              █████                         █████   ",
-                '\t'+"               ░░███                                              ░░███                         ░░███    ",
-                '\t'+"                ░███         ██████   ███████  ███████  ██████   ███████      ██████ █████ ████ ███████  ",
-                '\t'+"                ░███        ███░░███ ███░░███ ███░░███ ███░░███ ███░░███     ███░░███░░███ ░███ ░░░███░   ",
-                '\t'+"                ░███       ░███ ░███░███ ░███░███ ░███░███████ ░███ ░███    ░███ ░███ ░███ ░███   ░███    ",
-                '\t'+"                ░███      █░███ ░███░███ ░███░███ ░███░███░░░  ░███ ░███    ░███ ░███ ░███ ░███   ░███ ███",
-                '\t'+"                ███████████░░██████ ░░███████░░███████░░██████░░████████    ░░██████ ░░████████   ░░█████ ",
-                '\t'+"                ░░░░░░░░░░░  ░░░░░░  ░░░░░███ ░░░░░███  ░░░░░░  ░░░░░░░░     ░░░░░░    ░░░░░░░░    ░░░░░  ",
-                '\t'+"                                     ███ ░███ ███ ░███                                                    ",
-                '\t'+"                                     ░░██████ ░░██████                                                     ",
-                '\t'+"                                       ░░░░░░   ░░░░░░                                                      ",
-        };
-        for (String line : lines) {
-            System.out.println(line);
-            Thread.sleep(220);
-        }
-    }
-    public static void waitForEnter() {
-        System.out.println("Press Enter to continue...");
-        Scanner scanner = new Scanner(System.in);
-        scanner.nextLine();
-    }
-    public static void clearTerminal() {
-        System. out.print("\033[H\033[2J");
-        System. out.flush();
     }
 }

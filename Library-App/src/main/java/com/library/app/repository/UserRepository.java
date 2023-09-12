@@ -1,6 +1,7 @@
 package com.library.app.repository;
 
 import com.library.app.domain.User;
+import com.library.app.domain.enums.Colors;
 
 import java.sql.*;
 
@@ -30,7 +31,7 @@ public class UserRepository {
                     return user;
                 }
             }
-            System.out.println("Registration failed.");
+            System.out.println(Colors.RED.getColor() +"\n\nRegistration failed.");
             return null;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -39,7 +40,6 @@ public class UserRepository {
     }
     public User login(String email, String password) {
         String userLoginQuery = "SELECT user_id, name, email FROM users WHERE email = ? AND password = ?";
-        // Check if the user is in the 'librarian' or 'members' table
         String librarianCheckQuery = "SELECT librarian_id FROM librarian WHERE librarian_id = ?";
         String membersCheckQuery = "SELECT member_id FROM members WHERE member_id = ?";
 
@@ -59,7 +59,7 @@ public class UserRepository {
                 User user = new User(userId, userName, userEmail);
                 return user;
             } else {
-                System.out.println("Invalid email or password.");
+                System.out.println(Colors.RED.getColor() +"\n\nInvalid email or password.");
                 return null;
             }
         } catch (SQLException e) {
