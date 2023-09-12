@@ -1,14 +1,8 @@
 package com.library.app;
 import com.library.app.domain.*;
 import com.library.app.infrastructure.DbConnection;
-import com.library.app.repository.BookRepository;
-import com.library.app.repository.BorrowedBooksRepository;
-import com.library.app.repository.LostBooksRepository;
-import com.library.app.repository.MemberRepository;
-import com.library.app.services.BookService;
-import com.library.app.services.BorrowedBooksService;
-import com.library.app.services.LostBooksService;
-import com.library.app.services.MemberService;
+import com.library.app.repository.*;
+import com.library.app.services.*;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -55,6 +49,8 @@ public class Main {
             Librarian librarian = new Librarian();
             MemberRepository memberRepository = new MemberRepository(dbConnection);
             MemberService memberService = new MemberService(memberRepository);
+            UserRepository userRepository = new UserRepository(dbConnection);
+            UserService userService = new UserService(userRepository);
             switch (choice) {
                 case 1:
                     Scanner scan = new Scanner(System.in);
@@ -62,7 +58,7 @@ public class Main {
                     String email = scan.nextLine();
                     System.out.print("Enter Password : ");
                     String password = scan.nextLine();
-                    User loggedInUser = user.login(dbConnection, email, password);
+                    User loggedInUser = userService.login(email, password);
                     if (loggedInUser != null) {
                         int user_id = loggedInUser.getId();
                         if (memberService.checkMember(user_id)) {
@@ -87,7 +83,7 @@ public class Main {
                     String newEmail = scan1.nextLine();
                     System.out.print("Password : ");
                     String newPassword = scan1.nextLine();
-                    User loggedUser = user.register(dbConnection, name, newEmail, newPassword, telephone, adresse);
+                    User loggedUser = userService.register(name, newEmail, newPassword, telephone, adresse);
                     if (loggedUser != null) {
                         int user_id = loggedUser.getId();
                         memberMenu(user_id);

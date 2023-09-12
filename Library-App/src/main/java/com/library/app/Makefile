@@ -1,2 +1,2 @@
 run:
-	/home/mj/.jdks/corretto-11.0.20.1/bin/java -javaagent:/snap/intellij-idea-community/454/lib/idea_rt.jar=33643:/snap/intellij-idea-community/454/bin -Dfile.encoding=UTF-8 -classpath /home/mj/Library_APP_JAVA/Library-App/target/classes:/home/mj/Downloads/mysql-connector-j_8.1.0-1ubuntu22.04_all/usr/share/java/mysql-connector-j-8.1.0.jar com.library.app.Main
+	/home/mj/.jdks/corretto-11.0.20.1/bin/java -javaagent:/snap/intellij-idea-community/454/lib/idea_rt.jar=42875:/snap/intellij-idea-community/454/bin -Dfile.encoding=UTF-8 -classpath /home/mj/Library_APP_JAVA/Library-App/target/classes:/home/mj/Downloads/mysql-connector-j_8.1.0-1ubuntu22.04_all/usr/share/java/mysql-connector-j-8.1.0.jar com.library.app.Main
