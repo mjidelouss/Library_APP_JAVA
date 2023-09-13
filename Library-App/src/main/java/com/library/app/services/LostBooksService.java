@@ -15,4 +15,8 @@ public class LostBooksService {
     public List<LostBook> displayLostBooks() {
         return this.lostBooksRepository.displayLostBooks();
     }
+
+    public void insertLostBooks() {
+        this.lostBooksRepository.insertLostBooks();
+    }
 }

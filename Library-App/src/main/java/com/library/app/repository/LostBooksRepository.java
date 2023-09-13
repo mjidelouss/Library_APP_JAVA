@@ -2,10 +2,7 @@ package com.library.app.repository;
 
 import com.library.app.domain.LostBook;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,5 +33,19 @@ public class LostBooksRepository {
             e.printStackTrace();
         }
         return lostBookList;
+    }
+
+    public void insertLostBooks() {
+        try {
+            String insertQuery = "INSERT INTO lostBooks (book_isbn, book_title, book_author, book_category, book_year) " +
+                    "SELECT book_isbn, book_title, book_author, book_category, book_year " +
+                    "FROM borrowedBooks WHERE due_date < CURDATE() " +
+                    "AND NOT EXISTS (SELECT 1 FROM lostBooks WHERE lostBooks.book_isbn = borrowedBooks.book_isbn)";
+
+            PreparedStatement preparedStatement = dbConnection.prepareStatement(insertQuery);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
