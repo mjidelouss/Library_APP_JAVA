@@ -10,6 +10,9 @@ import java.sql.*;
 import java.util.Scanner;
 import java.util.List;
 
+import static com.library.app.ressources.Ressource.clearTerminal;
+import static com.library.app.ressources.Ressource.waitForEnter;
+
 public class Main {
 
 
@@ -28,7 +31,7 @@ public class Main {
     }
 
     public static int menu() throws InterruptedException {
-        Ressource.clearTerminal();
+        clearTerminal();
         Connection dbConnection = DbConnection.connect();
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -54,7 +57,7 @@ public class Main {
                     break;
                 default:
                     System.out.println(Colors.RED.getColor() +"\n\nInvalid choice. Please try again.");
-                    Ressource.waitForEnter();
+                    waitForEnter();
             }
         }
     }
@@ -75,30 +78,38 @@ public class Main {
                 case 1:
                     List<Book> books = bookService.displayBooks();
                     Ressource.availableBooksTable(books);
+                    waitForEnter();
+                    clearTerminal();
                     break;
                 case 2:
-                    System.out.print(Colors.PURPLE.getColor() +"Search Term : " + Colors.RESET.getColor());
+                    List<Book> books1 = bookService.displayBooks();
+                    Ressource.availableBooksTable(books1);
+                    System.out.print(Colors.PURPLE.getColor() +"\nSearch Term : " + Colors.RESET.getColor());
                     String searchTerm = scanner.nextLine();
                     List<Book> searchedBooks = bookService.searchBook(searchTerm);
                     Ressource.searchedBookTable(searchedBooks);
                     break;
                 case 3:
-                    System.out.print(Colors.PURPLE.getColor() +"Enter ISBN : " + Colors.RESET.getColor());
+                    List<Book> books2 = bookService.displayBooks();
+                    Ressource.availableBooksTable(books2);
+                    System.out.print(Colors.PURPLE.getColor() +"\nEnter ISBN : " + Colors.RESET.getColor());
                     String borrowIsbn = scanner.nextLine();
                     BorrowedBook borrowedBook = borrowedBooksService.borrowBook(user_id, borrowIsbn);
                     Ressource.borrowedBookTable(borrowedBook);
                     break;
                 case 4:
-                    System.out.print(Colors.PURPLE.getColor() +"Enter ISBN : " + Colors.RESET.getColor());
+                    List<Book> books3 = bookService.displayBooks();
+                    Ressource.availableBooksTable(books3);
+                    System.out.print(Colors.PURPLE.getColor() +"\nEnter ISBN : " + Colors.RESET.getColor());
                     String returnIsbn = scanner.nextLine();
                     BorrowedBook returnedBook = borrowedBooksService.returnBook(user_id, returnIsbn);
                     Ressource.returnBookTable(returnedBook);
                     break;
                 case 5:
                     user_id = 0;
-                    Ressource.clearTerminal();
+                    clearTerminal();
                     Ressource.logout();
-                    Ressource.waitForEnter();
+                    waitForEnter();
                     menu();
                     break;
                 case 6:
@@ -106,8 +117,8 @@ public class Main {
                     break;
                 default:
                     System.out.println(Colors.RED.getColor() +"Invalid choice. Please try again.");
-                    Ressource.waitForEnter();
-                    Ressource.clearTerminal();
+                    waitForEnter();
+                    clearTerminal();
             }
         }
     }
@@ -157,9 +168,9 @@ public class Main {
                     break;
                 case 7:
                     user_id = 0;
-                    Ressource.clearTerminal();
+                    clearTerminal();
                     Ressource.logout();
-                    Ressource.waitForEnter();
+                    waitForEnter();
                     menu();
                     break;
                 case 8:
@@ -167,8 +178,8 @@ public class Main {
                     break;
                 default:
                     System.out.println(Colors.RED.getColor() +"\nInvalid choice. Please try again.");
-                    Ressource.waitForEnter();
-                    Ressource.clearTerminal();
+                    waitForEnter();
+                    clearTerminal();
             }
         }
     }

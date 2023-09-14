@@ -171,8 +171,6 @@ public class Ressource {
             }
             System.out.println('\t'+ Colors.CYAN.getColor() +"        ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
         }
-        waitForEnter();
-        clearTerminal();
     }
 
     public static void searchedBookTable(List<Book> searchedBooks) {
