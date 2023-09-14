@@ -2,8 +2,6 @@ package com.library.app.services;
 
 import com.library.app.domain.Book;
 import com.library.app.repository.BookRepository;
-
-import java.sql.Connection;
 import java.util.List;
 
 public class BookService {

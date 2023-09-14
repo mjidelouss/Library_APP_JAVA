@@ -160,26 +160,35 @@ public class Ressource {
 
     public static void availableBooksTable(List<Book> books) {
         System.out.print("\n\n");
-        System.out.println('\t'+ Colors.CYAN.getColor() +"        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═════════════════════════════════════════════════════╗");
-        System.out.println('\t'+ Colors.CYAN.getColor() +"        ║            Title               ║            Author            ║            ISBN             ║            Year             ║            Quantity                 ║");
-        System.out.println('\t'+ Colors.CYAN.getColor() +"        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════════════════════════════╣");
-        for (Book book : books) {
-            System.out.printf('\t'+ Colors.CYAN.getColor() +"        ║"+ Colors.YELLOW.getColor() +" %30s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %28s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %35s "+ Colors.CYAN.getColor() +"║%n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getYear(), book.getQuantity());
+        if (books.isEmpty()) {
+            System.out.println("There is 0 Books Available.\n");
+        } else {
+            System.out.println('\t'+ Colors.CYAN.getColor() +"        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═════════════════════════════════════════════════════╗");
+            System.out.println('\t'+ Colors.CYAN.getColor() +"        ║            Title               ║            Author            ║            ISBN             ║            Year             ║            Quantity                 ║");
+            System.out.println('\t'+ Colors.CYAN.getColor() +"        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════════════════════════════╣");
+            for (Book book : books) {
+                System.out.printf('\t'+ Colors.CYAN.getColor() +"        ║"+ Colors.YELLOW.getColor() +" %30s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %28s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %35s "+ Colors.CYAN.getColor() +"║%n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getYear(), book.getQuantity());
+            }
+            System.out.println('\t'+ Colors.CYAN.getColor() +"        ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
         }
-        System.out.println('\t'+ Colors.CYAN.getColor() +"        ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
         waitForEnter();
         clearTerminal();
     }
 
     public static void searchedBookTable(List<Book> searchedBooks) {
         System.out.print("\n\n");
-        System.out.println('\t'+ Colors.CYAN.getColor() +"        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╦═════════════════════════════════════╗");
-        System.out.println('\t'+ Colors.CYAN.getColor() +"        ║            Title               ║            Author            ║            ISBN             ║            Year             ║            Quantity                 ║");
-        System.out.println('\t'+ Colors.CYAN.getColor() +"        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════════════════════════════╣");
-        for (Book book : searchedBooks) {
-            System.out.printf('\t'+ Colors.CYAN.getColor() +"        ║"+ Colors.YELLOW.getColor() +" %30s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %28s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %35s "+ Colors.CYAN.getColor() +"║%n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getYear(), book.getQuantity());
+        if (searchedBooks.isEmpty()) {
+            System.out.println("0 Books Found.\n");
+        } else {
+            System.out.println('\t'+ Colors.CYAN.getColor() +"        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╦═════════════════════════════════════╗");
+            System.out.println('\t'+ Colors.CYAN.getColor() +"        ║            Title               ║            Author            ║            ISBN             ║            Year             ║            Quantity                 ║");
+            System.out.println('\t'+ Colors.CYAN.getColor() +"        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════════════════════════════╣");
+            for (Book book : searchedBooks) {
+                System.out.printf('\t'+ Colors.CYAN.getColor() +"        ║"+ Colors.YELLOW.getColor() +" %30s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %28s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %35s "+ Colors.CYAN.getColor() +"║%n", book.getTitle(), book.getAuthor(), book.getIsbn(), book.getYear(), book.getQuantity());
+            }
+            System.out.println('\t'+ Colors.CYAN.getColor() +"        ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
+            waitForEnter();
         }
-        System.out.println('\t'+ Colors.CYAN.getColor() +"        ╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
         waitForEnter();
         clearTerminal();
     }
@@ -210,26 +219,34 @@ public class Ressource {
 
     public  static void displayBorrowedBooksTable(List<BorrowedBook> borrowedBooks) {
         System.out.print("\n\n");
-        System.out.println(Colors.CYAN.getColor() +"╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╦═════════════╦════════════════════════════════════════════════════════╗");
-        System.out.println(Colors.CYAN.getColor() +"║            Title               ║            Author            ║            ISBN             ║            Year             ║         Borrow_Date         ║               Due_Date                 ║");
-        System.out.println(Colors.CYAN.getColor() +"╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬══════════════════╬═════════════════════╣");
-        for (BorrowedBook book : borrowedBooks) {
-            System.out.printf(Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %30s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %28s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %38s "+ Colors.CYAN.getColor() +"║%n", book.getBookTitle(), book.getBookAuthor(), book.getBookIsbn(), book.getBookYear(), book.getBorrowDate(), book.getDueDate());
+        if (borrowedBooks.isEmpty()) {
+            System.out.println("0 Books Found.\n");
+        } else {
+            System.out.println(Colors.CYAN.getColor() +"╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╦═════════════╦════════════════════════════════════════════════════════╗");
+            System.out.println(Colors.CYAN.getColor() +"║            Title               ║            Author            ║            ISBN             ║            Year             ║         Borrow_Date         ║               Due_Date                 ║");
+            System.out.println(Colors.CYAN.getColor() +"╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╬══════════════════╬═════════════════════╣");
+            for (BorrowedBook book : borrowedBooks) {
+                System.out.printf(Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %30s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %28s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %38s "+ Colors.CYAN.getColor() +"║%n", book.getBookTitle(), book.getBookAuthor(), book.getBookIsbn(), book.getBookYear(), book.getBorrowDate(), book.getDueDate());
+            }
+            System.out.println(Colors.CYAN.getColor() +"╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
         }
-        System.out.println(Colors.CYAN.getColor() +"╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
         waitForEnter();
         clearTerminal();
     }
 
     public static void displayLostBooksTable(List<LostBook> lostBooks) {
         System.out.print("\n\n");
-        System.out.println('\t'+ Colors.CYAN.getColor() +"        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╗");
-        System.out.println('\t'+ Colors.CYAN.getColor() +"        ║            Title               ║            Author            ║            ISBN             ║            Year             ║");
-        System.out.println('\t'+ Colors.CYAN.getColor() +"        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╣");
-        for (LostBook book : lostBooks) {
-            System.out.printf('\t'+ Colors.CYAN.getColor() +"        ║"+ Colors.YELLOW.getColor() +" %30s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %28s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║%n", book.getBookTitle(), book.getBookAuthor(), book.getBookIsbn(), book.getBookYear());
+        if (lostBooks.isEmpty()) {
+            System.out.println("0 Books Found.\n");
+        } else {
+            System.out.println('\t'+ Colors.CYAN.getColor() +"        ╔════════════════════════════════╦══════════════════════════════╦═════════════╦═══════════════╦═════════════╦═══════════════╗");
+            System.out.println('\t'+ Colors.CYAN.getColor() +"        ║            Title               ║            Author            ║            ISBN             ║            Year             ║");
+            System.out.println('\t'+ Colors.CYAN.getColor() +"        ╠══════════════╬═════════════════╬══════════════╬═══════════════╬═════════════╬═══════════════╬═════════════╬═══════════════╣");
+            for (LostBook book : lostBooks) {
+                System.out.printf('\t'+ Colors.CYAN.getColor() +"        ║"+ Colors.YELLOW.getColor() +" %30s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %28s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║"+ Colors.YELLOW.getColor() +" %27s "+ Colors.CYAN.getColor() +"║%n", book.getBookTitle(), book.getBookAuthor(), book.getBookIsbn(), book.getBookYear());
+            }
+            System.out.println('\t'+ Colors.CYAN.getColor() +"        ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
         }
-        System.out.println('\t'+ Colors.CYAN.getColor() +"        ╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
         waitForEnter();
         clearTerminal();
     }
